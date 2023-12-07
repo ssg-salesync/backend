@@ -1,12 +1,10 @@
 from flask import Flask
-from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-import os
 
 
 naming_convention = {
@@ -33,13 +31,11 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-    if app.config['SQLALCHEMY_DATABASE_URI'].startswith("sqlite"):
-        migration.init_app(app, db, render_as_batch=True)
-    else:
-        migration.init_app(app, db)
+    migration.init_app(app, db)
 
-    from app.api import api
+    from app.api import categories, items
 
-    app.register_blueprint(api, url_prefix="/api")
+    app.register_blueprint(categories.bp)
+    app.register_blueprint(items.bp)
 
     return app
