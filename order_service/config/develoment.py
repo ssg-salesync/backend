@@ -1,4 +1,3 @@
-from config.default import *
 from datetime import timedelta
 
 
