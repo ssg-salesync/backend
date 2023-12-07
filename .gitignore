@@ -1,3 +1,4 @@
 ./migrations
 __pycache__/
 ./venvs
+.DS_store
