@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 
 
+
 db = SQLAlchemy()
 
 
@@ -35,7 +36,7 @@ class orders(db.Model):
 
 class carts(db.Model):
     cart_id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Ingeger, db.ForeignKey('orders.order_id', ondelete='CASCADE', nullable=False))
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE', nullable=False))
     item_id = db.Column(db.Integer, db.ForeignKey('items.item_uid', ondelete='CASECADE', nullable=False))
     quantity = db.Column(db.Integer, nullable=False)
 
