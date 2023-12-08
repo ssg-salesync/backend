@@ -12,19 +12,19 @@ jwt = JWTManager()
 
 
 def create_app():
-    item_app = Flask(__name__)
-    item_app.config.from_envvar('APP_CONFIG_FILE')
+    app = Flask(__name__)
+    app.config.from_envvar('APP_CONFIG_FILE')
 
-    CORS(item_app)
+    CORS(app)
 
-    db.init_app(item_app)
-    bcrypt.init_app(item_app)
-    jwt.init_app(item_app)
-    migration.init_app(item_app, db)
+    db.init_app(app)
+    bcrypt.init_app(app)
+    jwt.init_app(app)
+    migration.init_app(app, db)
 
-    from .api import categories, items
+    # from .api import categories, items
 
-    # item_app.register_blueprint(categories.bp)
-    # item_app.register_blueprint(items.bp)
+    # app.register_blueprint(categories.bp)
+    # app.register_blueprint(items.bp)
 
-    return item_app
+    return app
