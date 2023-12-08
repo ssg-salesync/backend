@@ -1,4 +1,17 @@
-from item_service.app import db
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
+
+
+naming_convention = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
+
+
+db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 
 
 class Stores(db.Model):
@@ -37,7 +50,6 @@ class Carts(db.Model):
     cart_id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE', nullable=False))
     item_id = db.Column(db.Integer, db.ForeignKey('items.item_uid', ondelete='CASCADE', nullable=False))
-    quantity = db.Column(db.Integer, nullable=False)
 
 
 class Sales(db.Model):
