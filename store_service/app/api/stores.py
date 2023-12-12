@@ -3,7 +3,7 @@ from models.models import db
 from models.models import Stores
 from flask_bcrypt import *
 from flask_jwt_extended import *
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
 
 
 bp = Blueprint('stores', __name__, url_prefix='/stores')
@@ -70,7 +70,14 @@ def login():
 
     store = Stores.query.filter_by(username=username).first()
 
-    if store and check_password_hash(store.password, password):
-        return jsonify(store.serialize)
-    else:
+    if not store or not check_password_hash(store.password, password):
         return jsonify({'error': 'Invalid username or password'}), 400
+
+    access_token = create_access_token(identity=store.store_id)
+
+    return jsonify({
+        'result': "success",
+        "store_id": store.store_id,
+        "access_token": access_token,
+        "csrf_token": generate_csrf()
+    }), 200
