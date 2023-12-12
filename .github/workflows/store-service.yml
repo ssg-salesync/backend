@@ -17,7 +17,7 @@ jobs:
     
     - name: Bump Version and Push Tag
       id: tag_version
-      uses: mathieudutour/github-tag-action@v5.5
+      uses: mathieudutour/github-tag-action@v6.1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -50,16 +50,17 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: ssg-salesync/cicd
-        ref: main 
+        ref: main
         token: ${{ secrets.PAT }}
         path: cicd
 
     - name: Update Kubernetes Resources
       run: |
         pwd
-        cd cicd/overlays/prd/ 
+        cd cicd/overlays/prd/
         kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/hanggi-ecr=${{ steps.login-ecr.outputs.registry }}/hanggi-ecr:${{ steps.tag_version.outputs.new_tag }}
         cat kustomization.yaml
+    
     - name: Commit Menifest Files
       env: 
         GITHUB_TOKEN: ${{ secrets.PAT }}
@@ -68,5 +69,5 @@ jobs:
         git config --global user.email "21storeo@gmail.com"
         git config --global user.name "seungwonbased"
         git config --global github.token ${{ secrets.PAT }}
-        git commit -am "Update image tag ${{ steps.tag_version.outputs.new_tag }}"
+        git commit -am "Update Image Tag ${{ steps.tag_version.outputs.new_tag }}"
         git push -u origin main
