@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, redirect
 from models.models import db
 from models.models import Stores
 from flask_bcrypt import *
@@ -7,6 +7,12 @@ from flask_wtf.csrf import generate_csrf
 
 
 bp = Blueprint('stores', __name__, url_prefix='/stores')
+
+
+@bp.route('/', methods=['GET'])
+def get_stores():
+    stores = Stores.query.all()
+    return jsonify([store.serialize for store in stores])
 
 
 @bp.route('/', methods=['POST'])
