@@ -87,4 +87,3 @@ def delete_category(store_id: int, category_id: int) :
     }
 
     return jsonify(resp), 200
-
