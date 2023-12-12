@@ -43,13 +43,13 @@ class Orders(db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
     table_number = db.Column(db.Integer, nullable=False)
     is_processing = db.Column(db.Boolean, nullable=True)
-    cart_id = db.Column(db.Integer, db.ForeignKey('cart.cart_id', ondelete='CASCADE'), nullable=False)
+    cart_id = db.Column(db.Integer, db.ForeignKey('carts.cart_id', ondelete='CASCADE'), nullable=False)
 
 
 class Carts(db.Model):
     cart_id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.item_uid', ondelete='CASCADE'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=False)
 
 
 class Sales(db.Model):
