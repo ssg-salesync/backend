@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./store_service
-  
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
