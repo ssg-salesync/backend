@@ -36,7 +36,7 @@ def post_category(store_id : int) :
     store = Stores.query.filter(store_id=get_jwt_identity()).first()
 
     # jwt 권한 x
-    if store_id is None:
+    if store.store_id != store_id:
         resp = {
             "result": "failed",
             "message": "카테고리 등록 권한 없음"
