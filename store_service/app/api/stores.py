@@ -12,7 +12,20 @@ bp = Blueprint('stores', __name__, url_prefix='/stores')
 @bp.route('/', methods=['GET'])
 def get_stores():
     stores = Stores.query.all()
-    return jsonify([store.serialize for store in stores])
+    return {
+        "stores": [
+            {
+                "id": store.store_id,
+                "username": store.username,
+                "owner_name": store.owner_name,
+                "phone": store.phone,
+                "store_name": store.store_name,
+                "address": store.address,
+                "store_type": store.store_type
+            }
+            for store in stores
+        ]
+    }
 
 
 @bp.route('/', methods=['POST'])
