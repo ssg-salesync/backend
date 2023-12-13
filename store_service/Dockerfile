@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM base AS builder
 
 WORKDIR /salesync/store_service
 
