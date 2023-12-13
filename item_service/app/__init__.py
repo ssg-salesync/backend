@@ -22,9 +22,8 @@ def create_app():
     jwt.init_app(app)
     migration.init_app(app, db)
 
-    # from .api import categories, items
+    from .api import categories
 
-    # app.register_blueprint(categories.bp)
-    # app.register_blueprint(items.bp)
+    app.register_blueprint(categories.bp)
 
     return app
