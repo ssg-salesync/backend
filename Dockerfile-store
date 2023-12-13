@@ -7,7 +7,8 @@ COPY ./models ./models
 COPY ./store_service ./store_service
 
 RUN apt-get update -y
-
+RUN apt-get install -y libpq-dev
+RUN apt-get install -y python3-dev
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 
