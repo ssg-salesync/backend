@@ -2,8 +2,8 @@ FROM ubuntu:20.04
 
 WORKDIR /salesync
 
-COPY ./models/ ./models/
-COPY ./store_service/ ./store_service/
+COPY ./models/ .
+COPY ./store_service/ .
 
 RUN apt-get update -y
 RUN apt-get install -y libpq-dev
@@ -27,6 +27,6 @@ ENV JWT_SECRET_KEY=b'\xb4\xc4\x8b\xfbU\xc1\x8d\x1d\x82\xca\x08^\x0bO\x05I'
 
 RUN cd store_service
 RUN ls
-RUN ["chmod", "+x", "app.sh"]
+RUN chmod +x app.sh
 
 CMD ./app.sh
