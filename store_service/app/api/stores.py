@@ -45,8 +45,6 @@ def create_store():
     db.session.add(store)
     db.session.commit()
 
-    return jsonify(store.serialize), 201
-
 
 @bp.route('/<int:store_id>', methods=['GET'])
 def get_store(store_id):
