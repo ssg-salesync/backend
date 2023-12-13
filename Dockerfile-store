@@ -2,8 +2,8 @@ FROM ubuntu:20.04
 
 WORKDIR /salesync
 
-COPY ./models ./models
-COPY ./store_service ./store_service
+COPY ./models/ ./models/
+COPY ./store_service/ ./store_service/
 
 RUN apt-get update -y
 RUN apt-get install -y libpq-dev
