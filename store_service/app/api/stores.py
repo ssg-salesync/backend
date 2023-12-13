@@ -12,7 +12,7 @@ bp = Blueprint('stores', __name__, url_prefix='/stores')
 @bp.route('/', methods=['GET'])
 def get_stores():
     stores = Stores.query.all()
-    return jsonify([store.serialize for store in stores])
+    return jsonify(stores)
 
 
 @bp.route('/', methods=['POST'])
