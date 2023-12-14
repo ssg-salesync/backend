@@ -53,8 +53,34 @@ def post_category() :
         "id": new_category.category_id
     }, 200
 
+# 카테고리 수정
+@bp.route('/<int:category_id>', methods=['PUT'])
+def put_category(category_id: int) :
+    
+    category = Categories.query.filter_by(category_id=category_id).first()
+
+    if category is None:
+        return {
+            "result": "failed",
+            "message": '카테고리가 존재하지 않습니다.'
+        }, 404
+
+    req = request.get_json()
+
+    category.name = req['name']
+
+    db.session.commit()
+
+    return {
+        "result": "success",
+        "message": "카테고리 수정 성공",
+        "id": category_id
+    }, 200
+
+
+
+# 카테고리 삭제
 @bp.route('/<int:category_id>', methods=['DELETE'])
-# @jwt_required
 def delete_category(category_id: int) :
         
     category = Categories.query.filter_by(category_id=category_id).first()
