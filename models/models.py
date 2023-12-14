@@ -16,25 +16,25 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 
 class Stores(db.Model):
     store_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(20), nullable=False)
-    owner_name = db.Column(db.String(20), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    store_name = db.Column(db.String(30), nullable=False)
+    username = db.Column(db.String(200), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    owner_name = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(200), nullable=False)
+    store_name = db.Column(db.String(300), nullable=False)
     address = db.Column(db.String(100), nullable=False)
-    store_type = db.Column(db.String(20), nullable=False)
+    store_type = db.Column(db.String(200), nullable=False)
 
 
 class Categories(db.Model):
     category_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('stores.store_id'), nullable=False)
     stores = db.relationship('Stores', backref=db.backref('category_set'))
 
 
 class Items(db.Model):
     item_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(500), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.category_id', ondelete='CASCADE'), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), nullable=True)
