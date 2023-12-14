@@ -14,6 +14,7 @@ bcrypt = Bcrypt()
 @bp.route('/', methods=['GET'])
 def get_stores():
     stores = Stores.query.all()
+
     return {
         "stores": [
             {
@@ -46,6 +47,20 @@ def create_store():
                    address=address, store_type=store_type)
     db.session.add(store)
     db.session.commit()
+
+    return jsonify({
+        "store": {
+            "store_id": store.store_id,
+            "username": store.username,
+            "owner_name": store.owner_name,
+            "phone": store.phone,
+            "store_name": store.store_name,
+            "address": store.address,
+            "store_type": store.store_type
+        },
+        "result": "success",
+        "message": "매장 등록 성공"
+    }), 201
 
 
 @bp.route('/<int:store_id>', methods=['GET'])
