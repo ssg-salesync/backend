@@ -25,7 +25,7 @@ JWT_DECODE_ALGORITHMS = ['HS256']
 # Location to check when validate JWT token
 JWT_TOKEN_LOCATION = ['headers']
 # JWT Access token expiration
-JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
 # JWT refresh token expiration
 JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=14)
 # If not production, off secure
