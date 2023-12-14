@@ -3,8 +3,6 @@ from models.models import db
 from models.models import Categories, Items, Stores
 from flask_cors import CORS
 from flask_jwt_extended import *
-import requests
-
 
 bp = Blueprint('items', __name__, url_prefix='/categories')
 
@@ -22,9 +20,6 @@ def get_item() :
     for category in categories:
         items = Items.query.filter_by(category_id=category.category_id).all()
         resp.append(items)
-
-    for items in resp:
-        print(items)
     
     
     return {
@@ -33,8 +28,7 @@ def get_item() :
                 "id": item.item_id,
                 "name": item.name,
                 "category_id": item.category_id,
-                "price": item.price,
-                "description": item.description
+                "price": item.price
             }
             for items in resp
             for item in items
@@ -48,7 +42,7 @@ def post_item(category_id: int):
 
     req = request.get_json()
 
-    new_item = Items(name=req['name'], category_id=category_id, price=req['price'], description=req['description'])
+    new_item = Items(name=req['name'], category_id=category_id, price=req['price'])
 
     db.session.add(new_item)
     db.session.commit()
@@ -71,7 +65,6 @@ def put_item(item_id: int):
 
     edit_item.name = req['name']
     edit_item.price = req['price']
-    edit_item.description = req['description']
 
     db.session.commit()
 
