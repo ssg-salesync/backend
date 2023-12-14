@@ -22,8 +22,8 @@ def create_app():
     jwt.init_app(app)
     migration.init_app(app, db)
 
-    from .api import stores
+    from .api.stores import bp as stores
 
-    app.register_blueprint(stores.bp)
+    app.register_blueprint(stores)
 
     return app

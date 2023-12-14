@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, redirect
+from flask import Blueprint, jsonify, request
 from models.models import db
 from models.models import Stores
 from flask_bcrypt import *
@@ -15,7 +15,7 @@ bcrypt = Bcrypt()
 def get_stores():
     stores = Stores.query.all()
 
-    return {
+    return jsonify({
         "stores": [
             {
                 "id": store.store_id,
@@ -28,7 +28,7 @@ def get_stores():
             }
             for store in stores
         ]
-    }
+    }), 200
 
 
 @bp.route('/', methods=['POST'])
@@ -66,7 +66,17 @@ def create_store():
 @bp.route('/<int:store_id>', methods=['GET'])
 def get_store(store_id):
     store = Stores.query.get(store_id)
-    return jsonify(store.serialize)
+    return jsonify({
+        "store": {
+            "store_id": store.store_id,
+            "username": store.username,
+            "owner_name": store.owner_name,
+            "phone": store.phone,
+            "store_name": store.store_name,
+            "address": store.address,
+            "store_type": store.store_type
+        }
+    }), 200
 
 
 @bp.route('/<int:store_id>', methods=['PUT'])
@@ -84,7 +94,17 @@ def update_store(store_id):
 
     db.session.commit()
 
-    return jsonify(store.serialize)
+    return jsonify({
+        "store": {
+            "store_id": store.store_id,
+            "username": store.username,
+            "owner_name": store.owner_name,
+            "phone": store.phone,
+            "store_name": store.store_name,
+            "address": store.address,
+            "store_type": store.store_type
+        }
+    }), 200
 
 
 @bp.route('/<int:store_id>', methods=['DELETE'])
@@ -115,4 +135,3 @@ def login():
         "access_token": access_token,
         "csrf_token": generate_csrf()
     }), 200
-
