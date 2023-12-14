@@ -12,6 +12,7 @@ bp = Blueprint('stores', __name__, url_prefix='/stores')
 @bp.route('/', methods=['GET'])
 def get_stores():
     stores = Stores.query.all()
+
     return {
         "stores": [
             {
@@ -44,6 +45,20 @@ def create_store():
                    address=address, store_type=store_type)
     db.session.add(store)
     db.session.commit()
+
+    return jsonify({
+        "store": {
+            "store_id": store.store_id,
+            "username": store.username,
+            "owner_name": store.owner_name,
+            "phone": store.phone,
+            "store_name": store.store_name,
+            "address": store.address,
+            "store_type": store.store_type
+        },
+        "result": "success",
+        "message": "매장 등록 성공"
+    }), 201
 
 
 @bp.route('/<int:store_id>', methods=['GET'])
@@ -88,7 +103,7 @@ def login():
     store = Stores.query.filter_by(username=username).first()
 
     if not store or not check_password_hash(store.password, password):
-        return jsonify({'error': 'Invalid username or password'}), 400
+        return jsonify({'error': 'Invalid username or password'}), 404
 
     access_token = create_access_token(identity=store.store_id)
 
