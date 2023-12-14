@@ -4,9 +4,11 @@ from models.models import Stores
 from flask_bcrypt import *
 from flask_jwt_extended import *
 from flask_wtf.csrf import generate_csrf
+from flask_bcrypt import Bcrypt
 
 
 bp = Blueprint('stores', __name__, url_prefix='/stores')
+bcrypt = Bcrypt()
 
 
 @bp.route('/', methods=['GET'])
@@ -34,7 +36,7 @@ def create_store():
     data = request.get_json()
 
     username = data['username']
-    password = generate_password_hash(data['password']).decode('utf-8')
+    password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     owner_name = data['owner_name']
     phone = data['phone']
     store_name = data['store_name']
@@ -102,8 +104,8 @@ def login():
 
     store = Stores.query.filter_by(username=username).first()
 
-    if not store or not check_password_hash(store.password, password):
-        return jsonify({'error': 'Invalid username or password'}), 404
+    if not store or not bcrypt.check_password_hash(store.password, password):
+        return jsonify({'error': 'Invalid username or password'}), 400
 
     access_token = create_access_token(identity=store.store_id)
 
