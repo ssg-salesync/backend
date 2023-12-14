@@ -104,7 +104,7 @@ def login():
 
     store = Stores.query.filter_by(username=username).first()
 
-    if not store or not bcrypt.check_password_hash(store.password, password):
+    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
         return jsonify({'error': 'Invalid username or password'}), 400
 
     access_token = create_access_token(identity=store.store_id)
