@@ -113,7 +113,10 @@ def delete_store(store_id):
     db.session.delete(store)
     db.session.commit()
 
-    return jsonify(store.serialize)
+    return jsonify({
+        "result": "success",
+        "message": "매장 삭제 성공"
+    }), 200
 
 
 @bp.route('/login', methods=['POST'])
