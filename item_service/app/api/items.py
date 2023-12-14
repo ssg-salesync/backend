@@ -25,6 +25,7 @@ def get_item() :
         # 카테고리별 아이템 정보를 담을 딕셔너리
         category_data = {
             "category_id": category.category_id,
+            "category_name": category.name,
             "items": []
         }
 
