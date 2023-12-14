@@ -13,27 +13,35 @@ def get_item() :
 
     store_id = get_jwt_identity()
 
-    resp = []
-
     categories = Categories.query.filter_by(store_id=store_id).all()
-    
+
+    resp = {"categories": []}
+
+    print(categories)
+
     for category in categories:
         items = Items.query.filter_by(category_id=category.category_id).all()
-        resp.append(items)
-    
-    
-    return {
-        "items": [
-            {
-                "id": item.item_id,
+        
+        # 카테고리별 아이템 정보를 담을 딕셔너리
+        category_data = {
+            "category_id": category.category_id,
+            "items": []
+        }
+
+        for item in items:
+            # 아이템 정보를 담을 딕셔너리
+            item_data = {
+                "item_id": item.item_id,
                 "name": item.name,
-                "category_id": item.category_id,
                 "price": item.price
             }
-            for items in resp
-            for item in items
-        ]
-    }, 200
+            category_data['items'].append(item_data)
+        
+        # 카테고리 정보를 리스트에 추가
+        resp['categories'].append(category_data)
+    
+    return resp, 200
+
 
 # 품목 등록
 @bp.route('/<category_id>/items', methods=['POST'])
