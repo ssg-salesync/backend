@@ -41,23 +41,17 @@ class Items(db.Model):
     categories = db.relationship('Categories', backref=db.backref('item_set'))
 
 
-class Orders(db.Model):
-    order_id = db.Column(db.Integer, primary_key=True)
-    table_number = db.Column(db.Integer, nullable=False)
-    is_processing = db.Column(db.Boolean, nullable=True)
-
-
-class Carts(db.Model):
-    cart_id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=False)
-    orders = db.relationship('Orders', backref=db.backref('cart_set'))
-    items = db.relationship('Items', backref=db.backref('cart_set'))
-
-
 class Sales(db.Model):
     sale_id = db.Column(db.Integer, primary_key=True)
     total_price = db.Column(db.Integer, nullable=False)
     sale_date = db.Column(db.DateTime(), nullable=False)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE'), nullable=False)
-    orders = db.relationship('Orders', backref=db.backref('sale_set'))
+
+
+class ItemsPerSale(db.Model):
+    items_per_sale_id = db.Column(db.Integer, primary_key=True)
+    sale_id = db.Column(db.Integer, db.ForeignKey('sales.sale_id', ondelete='CASCADE'), nullable=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=True)
+    count = db.Column(db.Integer, nullable=False)
+    sales = db.relationship('Sales', backref=db.backref('items_per_sale_set'))
+    items = db.relationship('Items', backref=db.backref('items_per_sale_set'))
+
