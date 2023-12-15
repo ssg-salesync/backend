@@ -4,10 +4,10 @@ from models.models import Categories, Items, Stores
 from flask_cors import CORS
 from flask_jwt_extended import *
 
-bp = Blueprint('items', __name__, url_prefix='/items')
+bp = Blueprint('items', __name__, url_prefix='/categories')
 
 # 품목 리스트 조회
-@bp.route('/', methods=['GET'])
+@bp.route('/items', methods=['GET'])
 @jwt_required()
 def get_item() :
 
@@ -43,13 +43,13 @@ def get_item() :
 
 
 # 품목 등록
-@bp.route('/', methods=['POST'])
+@bp.route('/<category_id>/items', methods=['POST'])
 @jwt_required()
-def post_item():
+def post_item(category_id: int):
 
     req = request.get_json()
 
-    new_item = Items(name=req['name'], category_id=req['category_id'], price=req['price'])
+    new_item = Items(name=req['name'], category_id=category_id, price=req['price'])
 
     db.session.add(new_item)
     db.session.commit()
@@ -61,7 +61,7 @@ def post_item():
     }, 200
 
 # 품목 수정
-@bp.route('/<item_id>', methods=['PUT'])
+@bp.route('/items/<item_id>', methods=['PUT'])
 @jwt_required()
 def put_item(item_id: int):
         
@@ -81,7 +81,7 @@ def put_item(item_id: int):
     }, 200
 
 # 품목 삭제
-@bp.route('/<item_id>', methods=['DELETE'])
+@bp.route('/items/<item_id>', methods=['DELETE'])
 @jwt_required()
 def delete_item(item_id: int):
 
