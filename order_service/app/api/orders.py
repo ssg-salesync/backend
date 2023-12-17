@@ -15,6 +15,7 @@ bp = Blueprint('orders', __name__, url_prefix='/orders')
 
 # 주문 등록
 @bp.route('/', methods=['POST'])
+@jwt_required()
 def post_order() :
     req = request.get_json()
 
@@ -36,6 +37,7 @@ def post_order() :
 
 # 주문 상세 조회
 @bp.route('/<int:sale_id>', methods=['GET'])
+@jwt_required()
 def get_order(sale_id):
     sale = Sales.query.filter_by(sale_id=sale_id).first()
     items_per_sale = ItemsPerSale.query.filter_by(sale_id=sale_id).all()
@@ -87,6 +89,7 @@ def get_order(sale_id):
 
 # 주문 삭제
 @bp.route('/<int:sale_id>', methods=['DELETE'])
+@jwt_required()
 def delete_order(sale_id: int):
 
     sale = Sales.query.filter_by(sale_id=sale_id).first()
