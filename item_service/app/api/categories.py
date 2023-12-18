@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models.models import db
 from models.models import Categories, Items, Stores
-from flask_cors import CORS
 from flask_jwt_extended import *
 
 
