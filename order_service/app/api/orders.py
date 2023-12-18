@@ -1,36 +1,65 @@
-import datetime
-from flask import Blueprint, jsonify, request, redirect
+from datetime import datetime, timedelta
+from flask import Blueprint, jsonify, request
 from models.models import db
 from models.models import Sales, ItemsPerSale
-from flask_bcrypt import *
 from flask_jwt_extended import *
-from flask_bcrypt import Bcrypt
 
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
 
 
+@bp.route('/', methods=['GET'])
+@jwt_required()
+def get_orders_by_period():
+    period = request.args.get('period', type=int, default=1)
+
+    start_date = datetime.now() - timedelta(days=period)
+
+    print(start_date)
+
+    store_id = get_jwt_identity()
+    sales = Sales.query.filter(
+        (Sales.store_id == store_id) & (Sales.sale_date >= start_date)
+    ).all()
+
+    return jsonify({
+        "result": "success",
+        "message": "기간별 주문 목록 조회 성공",
+        "store_id": f"{store_id}",
+        "period": f"{period}일",
+        "sales": [
+            {
+                "id": sale.sale_id,
+                "total_price": sale.total_price,
+                "sale_date": sale.sale_date
+            }
+            for sale in sales
+        ]
+    }), 200
+
+
 # 주문 등록
 @bp.route('/', methods=['POST'])
 @jwt_required()
-def post_order() :
+def post_order():
     req = request.get_json()
 
-    new_sale = Sales(total_price=req['total_price'], sale_date=datetime.datetime.now())
+    new_sale = Sales(total_price=req['total_price'], sale_date=datetime.now())
 
     db.session.add(new_sale)
     db.session.commit()
     
-    for item in req['items'] :
+    for item in req['items']:
         new_item_per_sale = ItemsPerSale(sale_id=new_sale.sale_id, item_id=item['item_id'], count=item['count'])
         db.session.add(new_item_per_sale)
         db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "주문 등록 성공",
         "id": new_sale.sale_id
-    }, 201
+    }), 201
+
 
 # 주문 상세 조회
 @bp.route('/<int:sale_id>', methods=['GET'])
@@ -39,7 +68,7 @@ def get_order(sale_id):
     sale = Sales.query.filter_by(sale_id=sale_id).first()
     items_per_sale = ItemsPerSale.query.filter_by(sale_id=sale_id).all()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "주문 상세 조회 성공",
         "sale": {
@@ -54,7 +83,7 @@ def get_order(sale_id):
             }
             for item_per_sale in items_per_sale
         ]
-    }
+    }), 200
 
 
 # 주문 삭제
@@ -65,17 +94,16 @@ def delete_order(sale_id: int):
     sale = Sales.query.filter_by(sale_id=sale_id).first()
 
     if sale is None:
-        return {
+        return jsonify({
             "result": "failed",
-            "message": "주문 수정 실패"
-        }, 404
+            "message": "주문 삭제 실패"
+        }), 404
 
     db.session.query(Sales).filter_by(sale_id=sale_id).delete()
-
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "주문 삭제 성공",
         "sale_id": sale_id
-    }, 200
+    }), 200
