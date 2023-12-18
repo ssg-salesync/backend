@@ -99,3 +99,4 @@ def delete_category(category_id: int) :
         "message": "카테고리 삭제 성공",
         "category_id": category_id
     }, 200
+
