@@ -1,15 +1,16 @@
 from flask import Blueprint, request, jsonify
 from models.models import db
-from models.models import Categories, Items, Stores
-from flask_cors import CORS
+from models.models import Categories, Items
 from flask_jwt_extended import *
 
+
 bp = Blueprint('items', __name__, url_prefix='/categories')
+
 
 # 품목 리스트 조회
 @bp.route('/items', methods=['GET'])
 @jwt_required()
-def get_item() :
+def get_item():
 
     store_id = get_jwt_identity()
 
@@ -39,7 +40,7 @@ def get_item() :
         # 카테고리 정보를 리스트에 추가
         resp['categories'].append(category_data)
     
-    return resp, 200
+    return jsonify(resp), 200
 
 
 # 품목 등록
@@ -54,11 +55,12 @@ def post_item(category_id: int):
     db.session.add(new_item)
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "품목 등록 성공",
         "id": new_item.item_id
-    }, 200
+    }), 200
+
 
 # 품목 수정
 @bp.route('/items/<item_id>', methods=['PUT'])
@@ -74,11 +76,12 @@ def put_item(item_id: int):
 
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "품목 수정 성공",
         "item_id": edit_item.item_id
-    }, 200
+    }), 200
+
 
 # 품목 삭제
 @bp.route('/items/<item_id>', methods=['DELETE'])
@@ -96,8 +99,8 @@ def delete_item(item_id: int):
     db.session.delete(item)
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "품목 삭제 성공",
         "item_id": item.item_id
-    }, 200
+    }), 200

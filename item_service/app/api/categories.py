@@ -1,22 +1,22 @@
 from flask import Blueprint, request, jsonify
 from models.models import db
-from models.models import Categories, Items, Stores
+from models.models import Categories
 from flask_jwt_extended import *
-
 
 
 bp = Blueprint('categories', __name__, url_prefix='/categories')
 
+
 # 카테고리 조회
 @bp.route('/', methods=['GET'])
 @jwt_required()
-def get_category() :
+def get_category():
 
     store_id = get_jwt_identity()
 
     categories = Categories.query.filter_by(store_id=store_id).all()
 
-    return {
+    return jsonify({
         "categories" : [
             {
                 "id": category.category_id,
@@ -25,13 +25,13 @@ def get_category() :
             for category in categories
         ],
         "store_id": store_id
-    }
+    }), 200
 
 
 # 카테고리 등록
 @bp.route('/', methods=['POST'])
 @jwt_required()
-def post_category() :
+def post_category():
     
     store_id = get_jwt_identity()
 
@@ -45,15 +45,16 @@ def post_category() :
     db.session.add(new_category)
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "카테고리 등록 성공",
         "id": new_category.category_id
-    }, 201
+    }), 201
+
 
 # 카테고리 수정
 @bp.route('/<int:category_id>', methods=['PUT'])
-def put_category(category_id: int) :
+def put_category(category_id: int):
     
     category = Categories.query.filter_by(category_id=category_id).first()
 
@@ -69,17 +70,16 @@ def put_category(category_id: int) :
 
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "카테고리 수정 성공",
         "id": category_id
-    }, 201
-
+    }), 201
 
 
 # 카테고리 삭제
 @bp.route('/<int:category_id>', methods=['DELETE'])
-def delete_category(category_id: int) :
+def delete_category(category_id: int):
 
     category = Categories.query.filter_by(category_id=category_id).first()
 
@@ -93,9 +93,8 @@ def delete_category(category_id: int) :
 
     db.session.commit()
 
-    return {
+    return jsonify({
         "result": "success",
         "message": "카테고리 삭제 성공",
         "category_id": category_id
-    }, 200
-
+    }), 200
