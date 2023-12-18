@@ -45,6 +45,8 @@ class Sales(db.Model):
     sale_id = db.Column(db.Integer, primary_key=True)
     total_price = db.Column(db.Integer, nullable=False)
     sale_date = db.Column(db.DateTime(), nullable=False)
+    store_id = db.Column(db.Integer, db.ForeignKey('stores.store_id', ondelete='CASCADE'), nullable=False)
+    stores = db.relationship('Stores', backref=db.backref('sales_set'))
 
 
 class ItemsPerSale(db.Model):
@@ -53,6 +55,3 @@ class ItemsPerSale(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=True)
     count = db.Column(db.Integer, nullable=False)
     sales = db.relationship('Sales', backref=db.backref('items_per_sale_set'))
-    items = db.relationship('Items', backref=db.backref('items_per_sale_set'))
-
-# 트리거용 주석
