@@ -55,3 +55,4 @@ class ItemsPerSale(db.Model):
     sales = db.relationship('Sales', backref=db.backref('items_per_sale_set'))
     items = db.relationship('Items', backref=db.backref('items_per_sale_set'))
 
+# 트리거용 주석

@@ -56,33 +56,6 @@ def get_order(sale_id):
         ]
     }
 
-# 주문 수정을 필요 없다고 생각함 -> 프론트에서 결제 전 최종적으로 수정된 값을 보내줌 
-# 주문 수정
-# @bp.route('/<int:sale_id>', methods=['PUT'])
-# def put_order(sale_id: int) :
-#     sale = Sales.query.filter_by(sale_id=sale_id).first()
-#     items_per_sale = ItemsPerSale.query.filter_by(sale_id=sale_id).all()
-
-#     if sale is None:
-#         return {
-#             "result": "failed",
-#             "message": "주문 수정 실패"
-#         }, 404
-
-#     req = request.get_json()
-
-#     sale.total_price = req['total_price']
-#     sale.sale_date = datetime.datetime.now()
-
-#     db.session.commit()
-
-#     for item_per_sale in items_per_sale :
-#         item_per_sale.count = req['items'][item_per_sale.item_id]['count']
-
-#     return {
-#         "result": "success",
-#         "message": "주문 수정 성공"
-#     }
 
 # 주문 삭제
 @bp.route('/<int:sale_id>', methods=['DELETE'])
