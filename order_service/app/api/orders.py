@@ -9,9 +9,6 @@ from flask_bcrypt import Bcrypt
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
 
-# 주문 조회
-@bp.route('/', methods=['GET'])
-
 
 # 주문 등록
 @bp.route('/', methods=['POST'])
