@@ -10,12 +10,31 @@ bp = Blueprint('orders', __name__, url_prefix='/orders')
 
 @bp.route('/', methods=['GET'])
 @jwt_required()
+def get_orders():
+    store_id = get_jwt_identity()
+    sales = Sales.query.filter_by(store_id=store_id).all()
+
+    return jsonify({
+        "result": "success",
+        "message": "주문 목록 조회 성공",
+        "store_id": f"{store_id}",
+        "sales": [
+            {
+                "id": sale.sale_id,
+                "total_price": sale.total_price,
+                "sale_date": sale.sale_date
+            }
+            for sale in sales
+        ]
+    }), 200
+
+
+@bp.route('/by_period', methods=['GET'])
+@jwt_required()
 def get_orders_by_period():
     period = request.args.get('period', type=int, default=1)
 
     start_date = datetime.now() - timedelta(days=period)
-
-    print(start_date)
 
     store_id = get_jwt_identity()
     sales = Sales.query.filter(
@@ -38,13 +57,41 @@ def get_orders_by_period():
     }), 200
 
 
+@bp.route('/by_date', methods=['GET'])
+@jwt_required()
+def get_orders_by_date():
+    date = request.args.get('date', type=str, default=datetime.now().strftime('%Y-%m-%d'))
+    store_id = get_jwt_identity()
+    sales = Sales.query.filter(Sales.store_id == store_id).all()
+    daily_sales = []
+
+    for sale in sales:
+        if date in str(sale.sale_date):
+            daily_sales.append(sale)
+
+    return jsonify({
+        "result": "success",
+        "message": "일별 주문 목록 조회 성공",
+        "store_id": f"{store_id}",
+        "date": f"{date}",
+        "sales": [
+            {
+                "id": sale.sale_id,
+                "total_price": sale.total_price,
+                "sale_date": sale.sale_date
+            }
+            for sale in daily_sales
+        ]
+    }), 200
+
+
 # 주문 등록
 @bp.route('/', methods=['POST'])
 @jwt_required()
 def post_order():
     req = request.get_json()
-
-    new_sale = Sales(total_price=req['total_price'], sale_date=datetime.now())
+    store_id = get_jwt_identity()
+    new_sale = Sales(total_price=req['total_price'], sale_date=datetime.now(), store_id=store_id)
 
     db.session.add(new_sale)
     db.session.commit()
