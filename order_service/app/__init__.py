@@ -15,7 +15,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_envvar('APP_CONFIG_FILE')
 
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app)
 
     db.init_app(app)
     bcrypt.init_app(app)
