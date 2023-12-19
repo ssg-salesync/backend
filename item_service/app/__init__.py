@@ -16,7 +16,7 @@ def create_app():
     app.config.from_envvar('APP_CONFIG_FILE')
 
     # CORS(app)
-    cors = CORS(app, resources={r"/*": {"origins": "*"}})
+    cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
     db.init_app(app)
     bcrypt.init_app(app)
