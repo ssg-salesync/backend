@@ -86,7 +86,7 @@ def get_orders_by_date():
 
 
 # 주문 등록
-@bp.route('/', methods=['POST'])
+@bp.route('/', methods=['POST', 'OPTIONS'])
 @jwt_required()
 def post_order():
     req = request.get_json()
