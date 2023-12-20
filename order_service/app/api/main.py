@@ -1,7 +1,4 @@
-from flask import Blueprint, request, jsonify
-from models.models import db
-from models.models import Categories
-from flask_jwt_extended import *
+from flask import Blueprint
 
 bp = Blueprint('main', __name__, url_prefix='/')
 
