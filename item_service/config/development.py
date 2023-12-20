@@ -3,7 +3,7 @@ from datetime import timedelta
 
 DB_USER = "postgres"
 DB_PASSWORD = "password"
-DB_HOST = "dev-salesync.cunzt8irsgv8.ap-northeast-2.rds.amazonaws.com"
+DB_HOST = "salesync-rds.cunzt8irsgv8.ap-northeast-2.rds.amazonaws.com"
 DB_PORT = "5432"
 DB_NAME = "salesync"
 
