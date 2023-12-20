@@ -49,9 +49,18 @@ class Sales(db.Model):
     stores = db.relationship('Stores', backref=db.backref('sales_set'))
 
 
-class ItemsPerSale(db.Model):
-    items_per_sale_id = db.Column(db.Integer, primary_key=True)
-    sale_id = db.Column(db.Integer, db.ForeignKey('sales.sale_id', ondelete='CASCADE'), nullable=True)
+class Orders(db.Model):
+    order_id = db.Column(db.Integer, primary_key=True)
+    paid = db.Column(db.Boolean, nullable=False)
+    order_date = db.Column(db.DateTime(), nullable=False)
+    store_id = db.Column(db.Integer, db.ForeignKey('stores.store_id', ondelete='CASCADE'), nullable=False)
+    stores = db.relationship('Stores', backref=db.backref('order_set'))
+    table_no = db.Column(db.Integer, nullable=False)
+
+
+class Carts(db.Model):
+    cart_id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id', ondelete='CASCADE'), nullable=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=True)
-    count = db.Column(db.Integer, nullable=False)
-    sales = db.relationship('Sales', backref=db.backref('items_per_sale_set'))
+    orders = db.relationship('Orders', backref=db.backref('cart_set'))
+    items = db.relationship('Items', backref=db.backref('cart_set'))
