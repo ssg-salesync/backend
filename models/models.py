@@ -51,7 +51,7 @@ class Sales(db.Model):
 
 class Orders(db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
-    paid = db.Column(db.Boolean, nullable=False)
+    paid = db.Column(db.Boolean, nullable=False, default=False)
     order_date = db.Column(db.DateTime(), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('stores.store_id', ondelete='CASCADE'), nullable=False)
     stores = db.relationship('Stores', backref=db.backref('order_set'))
