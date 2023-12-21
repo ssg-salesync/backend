@@ -44,8 +44,6 @@ def get_unpaids():
     orders = db.session.query(Orders).filter_by(store_id=store_id, paid=False).all()
     cart_in_order = get_carts_in_order(orders)
 
-    print(cart_in_order)
-
     return jsonify({
         "result": "success",
         "message": "미결제 주문 목록 조회 성공",
@@ -74,31 +72,58 @@ def get_unpaids_by_table(table_no: int):
 
 
 def get_carts_in_order(orders):
-    cart_in_order = []
+    cart_in_order = {}
 
     for order in orders:
+        if order.table_no not in cart_in_order:
+            cart_in_order[order.table_no] = {
+                "order_id": order.order_id,
+                "order_date": order.order_date,
+                "table_no": order.table_no,
+                "total_price": 0,
+                "carts": []
+            }
+
         carts = Carts.query.filter(Carts.order_id == order.order_id).all()
         items_in_cart, total_price = get_items_in_cart(carts)
 
-        cart_in_order.append({
-            "order_id": order.order_id,
-            "order_date": order.order_date,
-            "table_no": order.table_no,
-            "total_price": total_price,
-            "carts": items_in_cart
-        })
+        cart_in_order[order.table_no]["total_price"] += total_price
 
-    print(orders)
-    return cart_in_order
+        # 같은 아이템이면 quantity만 누적
+        for item in items_in_cart:
+            existing_item = next((i for i in cart_in_order[order.table_no]["carts"] if i['item_id'] == item['item_id']), None)
+
+            if existing_item:
+                existing_item['quantity'] += item['quantity']
+            else:
+                cart_in_order[order.table_no]["carts"].append({
+                    "item_id": item["item_id"],
+                    "item_name": item["item_name"],
+                    "quantity": item["quantity"]
+                })
+
+    result = list(cart_in_order.values())
+    return result
 
 
 def get_items_in_cart(carts):
     items_in_cart = []
     total_price = 0
 
+    item_quantity_mapping = {}
+
     for cart in carts:
-        item = Items.query.filter(Items.item_id == cart.item_id).first()
-        items_in_cart.append({'item_id': item.item_id, 'item_name': item.name, 'quantity': cart.quantity})
-        total_price += (item.price * cart.quantity)
+        item_id = cart.item_id
+        quantity = cart.quantity
+
+        if item_id not in item_quantity_mapping:
+            item_quantity_mapping[item_id] = 0
+
+        item_quantity_mapping[item_id] += quantity
+
+    for item_id, quantity in item_quantity_mapping.items():
+        item = Items.query.filter(Items.item_id == item_id).first()
+        items_in_cart.append({'item_id': item_id, 'item_name': item.name, 'quantity': quantity})
+        total_price += (item.price * quantity)
 
     return items_in_cart, total_price
