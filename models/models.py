@@ -64,3 +64,4 @@ class Carts(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('items.item_id', ondelete='CASCADE'), nullable=True)
     orders = db.relationship('Orders', backref=db.backref('cart_set'))
     items = db.relationship('Items', backref=db.backref('cart_set'))
+    quantity = db.Column(db.Integer, nullable=False, default=1)
