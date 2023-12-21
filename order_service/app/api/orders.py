@@ -57,6 +57,13 @@ def get_unpaids():
 def get_unpaids_by_table(table_no: int):
     store_id = get_jwt_identity()
     order = db.session.query(Orders).filter_by(store_id=store_id, paid=False, table_no=table_no).first()
+
+    if order is None:
+        return jsonify({
+            "result": "failed",
+            "carts": []
+        }), 404
+
     carts = db.session.query(Carts).filter_by(order_id=order.order_id).all()
     cart_in_order, total_price = get_items_in_cart(carts)
 
