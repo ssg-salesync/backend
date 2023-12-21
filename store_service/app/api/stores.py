@@ -138,3 +138,20 @@ def login():
         "access_token": access_token,
         "csrf_token": generate_csrf()
     }), 200
+
+
+@bp.route('/check', methods=['GET'])
+def check_username():
+    username = request.args.get('username')
+    store = Stores.query.filter_by(username=username).first()
+
+    if store:
+        return jsonify({
+            "result": "failed",
+            "message": "이미 존재하는 아이디입니다."
+        }), 400
+    else:
+        return jsonify({
+            "result": "success",
+            "message": "사용 가능한 아이디입니다."
+        }), 200
