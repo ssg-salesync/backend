@@ -71,6 +71,30 @@ def get_unpaids_by_table(table_no: int):
     }), 200
 
 
+@bp.route('/payment', methods=['POST'])
+@jwt_required()
+def pay():
+    store_id = get_jwt_identity()
+    req = request.get_json()
+    table_no = req['table_no']
+
+    orders = db.session.query(Orders).filter_by(store_id=store_id, table_no=table_no, paid=False).all()
+
+    for order in orders:
+        order.paid = True
+
+    db.session.commit()
+
+    return jsonify({
+        "result": "success",
+        "message": "결제 성공",
+        "store_id": f"{store_id}",
+        "orders": orders,
+        "table_no": table_no,
+    }), 200
+
+
+
 def get_carts_in_order(orders):
     cart_in_order = {}
 
@@ -89,7 +113,6 @@ def get_carts_in_order(orders):
 
         cart_in_order[order.table_no]["total_price"] += total_price
 
-        # 같은 아이템이면 quantity만 누적
         for item in items_in_cart:
             existing_item = next((i for i in cart_in_order[order.table_no]["carts"] if i['item_id'] == item['item_id']), None)
 
