@@ -116,22 +116,32 @@ def get_order():
     table_no = req['table_no']
     carts = req['carts']
 
-    orders = Orders.query.filter_by(table_no=table_no, paid=False).all()
-    print(orders, type(orders))
+    if not carts:
+        old_orders = Orders.query.filter_by(table_no=table_no, paid=False).first()
+        db.session.delete(old_orders)
+        db.session.commit()
 
-    if not orders:
+        return jsonify({
+            "result": "success",
+            "message": "주문 수정 성공"
+        }), 200
+
+
+    order = Orders.query.filter_by(table_no=table_no, paid=False).first()
+
+    if not order:
         return jsonify({
             "result": "failed",
             "message": "존재하지 않는 주문"
         }), 404
 
-    for order in orders:
-        old_carts = Carts.query.filter_by(order_id=order.order_id).all()
-        for old_cart in old_carts:
-            db.session.delete(old_cart)
-            db.session.commit()
-        db.session.delete(order)
+
+    old_carts = Carts.query.filter_by(order_id=order.order_id).all()
+    for old_cart in old_carts:
+        db.session.delete(old_cart)
         db.session.commit()
+    db.session.delete(order)
+    db.session.commit()
 
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
