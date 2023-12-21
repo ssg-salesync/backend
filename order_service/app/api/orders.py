@@ -77,7 +77,7 @@ def get_unpaids_by_table(table_no: int):
     }), 200
 
 
-@bp.route('/payment', methods=['POST'])
+@bp.route('/payment', methods=['PUT'])
 @jwt_required()
 def pay():
     store_id = get_jwt_identity()
@@ -95,7 +95,6 @@ def pay():
         "result": "success",
         "message": "결제 성공",
         "store_id": f"{store_id}",
-        "orders": orders,
         "table_no": table_no,
     }), 200
 
@@ -110,6 +109,13 @@ def get_order():
     carts = req['carts']
 
     orders = Orders.query.filter_by(table_no=table_no, paid=False).all()
+    print(orders, type(orders))
+
+    if not orders:
+        return jsonify({
+            "result": "failed",
+            "message": "주문이 존재하지 않습니다."
+        }), 404
 
     for order in orders:
         old_carts = Carts.query.filter_by(order_id=order.order_id).all()
