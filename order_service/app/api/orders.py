@@ -134,6 +134,15 @@ def get_order():
     table_no = req['table_no']
     carts = req['carts']
 
+    if not carts:
+        db.session.delete(Orders.query.filter_by(table_no=table_no, paid=False).first())
+        db.session.commit()
+        return jsonify({
+            "result": "success",
+            "message": "주문 수정 성공"
+        }), 200
+
+
     orders = Orders.query.filter_by(table_no=table_no, paid=False).all()
     print(orders, type(orders))
 
