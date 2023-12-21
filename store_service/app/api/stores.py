@@ -149,7 +149,7 @@ def check_username():
         return jsonify({
             "result": "failed",
             "message": "이미 존재하는 아이디입니다."
-        }), 400
+        }), 200
     else:
         return jsonify({
             "result": "success",
