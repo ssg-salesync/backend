@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from models.models import db
 from flask_jwt_extended import *
 from models.models import Orders, Carts, Items
-from datetime
+from datetime import datetime
 
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
@@ -17,7 +17,7 @@ def create_order():
     table_no = req['table_no']
     carts = req['carts']
 
-    order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.datetime.now(), paid=False)
+    order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
     db.session.commit()
 
