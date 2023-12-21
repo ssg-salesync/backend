@@ -17,6 +17,14 @@ def create_order():
     table_no = req['table_no']
     carts = req['carts']
 
+    var_order = Orders.query.filter_by(table_no=table_no, paid=False).all()
+
+    if var_order:
+        return jsonify({
+            "result": "failed",
+            "message": "이미 존재하는 테이블입니다."
+        }), 404
+
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
     db.session.commit()
