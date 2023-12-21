@@ -17,12 +17,12 @@ def create_order():
     table_no = req['table_no']
     carts = req['carts']
 
-    var_order = Orders.query.filter_by(table_no=table_no, paid=False).all()
+    existing_order = Orders.query.filter_by(table_no=table_no, paid=False).all()
 
-    if var_order:
+    if existing_order:
         return jsonify({
             "result": "failed",
-            "message": "이미 존재하는 테이블입니다."
+            "message": "신규 주문 등록 실패"
         }), 404
 
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
@@ -122,7 +122,7 @@ def get_order():
     if not orders:
         return jsonify({
             "result": "failed",
-            "message": "주문이 존재하지 않습니다."
+            "message": "존재하지 않는 주문"
         }), 404
 
     for order in orders:
