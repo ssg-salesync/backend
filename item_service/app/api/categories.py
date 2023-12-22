@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.models import db
-from models.models import Categories
+from ..models import db, Categories
 from flask_jwt_extended import *
 
 
