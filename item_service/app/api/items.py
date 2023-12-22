@@ -104,3 +104,17 @@ def delete_item(item_id: int):
         "message": "품목 삭제 성공",
         "item_id": item.item_id
     }), 200
+
+@bp.route('/<item_id>', methods=['GET'])
+def get_item_by_id(item_id: int):
+    item = Items.query.filter_by(item_id=item_id).first()
+
+    return jsonify({
+        "result": "success",
+        "message": "품목 조회 성공",
+        "item": {
+            "item_id": item.item_id,
+            "name": item.name,
+            "price": item.price
+        }
+    }), 200
