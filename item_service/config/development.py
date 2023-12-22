@@ -5,7 +5,7 @@ DB_USER = "postgres"
 DB_PASSWORD = "password"
 DB_HOST = "salesync-rds.cunzt8irsgv8.ap-northeast-2.rds.amazonaws.com"
 DB_PORT = "5432"
-DB_NAME = "salesync"
+DB_NAME = "dev-item"
 
 
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}:{port}/{db}'.format(
