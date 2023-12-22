@@ -105,7 +105,7 @@ def delete_item(item_id: int):
         "item_id": item.item_id
     }), 200
 
-@bp.route('/<item_id>', methods=['GET'])
+@bp.route('/items/<item_id>', methods=['GET'])
 def get_item_by_id(item_id: int):
     item = Items.query.filter_by(item_id=item_id).first()
 
