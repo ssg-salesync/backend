@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
+import requests
 from models.models import db
 from flask_jwt_extended import *
-from models.models import Orders, Carts, Items
+from models.models import Orders, Carts
 from datetime import datetime
 
 
@@ -234,8 +235,8 @@ def get_items_in_cart(carts):
         item_quantity_mapping[item_id] += quantity
 
     for item_id, quantity in item_quantity_mapping.items():
-        item = Items.query.filter(Items.item_id == item_id).first()
-        items_in_cart.append({'item_id': item_id, 'item_name': item.name, 'quantity': quantity})
-        total_price += (item.price * quantity)
+        item = requests.get(f'http://api.salesync.site/categories/items/{item_id}').json()['item']
+        items_in_cart.append({'item_id': item_id, 'item_name': item['name'], 'quantity': quantity})
+        total_price += (item['price'] * quantity)
 
     return items_in_cart, total_price
