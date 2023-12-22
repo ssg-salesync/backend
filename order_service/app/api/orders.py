@@ -1,9 +1,11 @@
-from flask import Blueprint, jsonify, request
-import requests
-from ..models import db, Orders, Carts
-from flask_jwt_extended import *
 from datetime import datetime
 
+import json
+import requests
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import *
+
+from ..models import db, Orders, Carts
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
 
@@ -16,6 +18,14 @@ def create_order():
 
     table_no = req['table_no']
     carts = req['carts']
+
+    if carts is None or len(carts) == 0:
+        db.session.delete(Orders.query.filter_by(table_no=table_no, paid=False).first())
+        db.session.commit()
+        return jsonify({
+            "result": "success",
+            "message": "주문 취소 성공"
+        }), 200
 
     existing_order = Orders.query.filter_by(table_no=table_no, paid=False).all()
 
@@ -126,7 +136,6 @@ def get_order():
             "message": "주문 수정 성공"
         }), 200
 
-
     order = Orders.query.filter_by(table_no=table_no, paid=False).first()
 
     if not order:
@@ -134,7 +143,6 @@ def get_order():
             "result": "failed",
             "message": "존재하지 않는 주문"
         }), 404
-
 
     old_carts = Carts.query.filter_by(order_id=order.order_id).all()
     for old_cart in old_carts:
@@ -232,9 +240,26 @@ def get_items_in_cart(carts):
             item_quantity_mapping[item_id] = 0
 
         item_quantity_mapping[item_id] += quantity
-
+    print(carts)
+    print(item_quantity_mapping)
     for item_id, quantity in item_quantity_mapping.items():
-        item = requests.get(f'http://api.salesync.site/categories/items/{item_id}').json()['item']
+        try:
+            response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
+            response.raise_for_status()
+            item = response.json()['item']
+
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP Error: {http_err}")
+            continue
+
+        except requests.exceptions.RequestException as request_err:
+            print(f"Request Error: {request_err}")
+            continue
+
+        except requests.exceptions.JSONDecodeError as json_err:
+            print(f"JSON Decode Error: {json_err}")
+            continue
+
         items_in_cart.append({'item_id': item_id, 'item_name': item['name'], 'quantity': quantity})
         total_price += (item['price'] * quantity)
 
