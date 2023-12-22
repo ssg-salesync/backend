@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models.models import db
-from models.models import Stores
+from ..models import db, Stores
 from flask_bcrypt import *
 from flask_jwt_extended import *
 from flask_wtf.csrf import generate_csrf
