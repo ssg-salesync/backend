@@ -19,12 +19,16 @@ def create_order():
     table_no = req['table_no']
     carts = req['carts']
 
-    if carts is None or len(carts) == 0:
-        db.session.delete(Orders.query.filter_by(table_no=table_no, paid=False).first())
-        db.session.commit()
+    if not carts:
+        # db.session.delete(Orders.query.filter_by(table_no=table_no, paid=False).first())
+        # db.session.commit()
+        # return jsonify({
+        #     "result": "success",
+        #     "message": "주문 취소 성공"
+        # }), 200
         return jsonify({
-            "result": "success",
-            "message": "주문 취소 성공"
+            "result": "failed",
+            "message": "주문 등록 실패 : 주문 내역 없음"
         }), 200
 
     existing_order = Orders.query.filter_by(table_no=table_no, paid=False).all()
@@ -133,7 +137,7 @@ def get_order():
 
         return jsonify({
             "result": "success",
-            "message": "주문 수정 성공"
+            "message": "주문 취소 : 주문 내역 없음"
         }), 200
 
     order = Orders.query.filter_by(table_no=table_no, paid=False).first()
@@ -240,8 +244,8 @@ def get_items_in_cart(carts):
             item_quantity_mapping[item_id] = 0
 
         item_quantity_mapping[item_id] += quantity
-    print(carts)
-    print(item_quantity_mapping)
+    # print(carts)
+    # print(item_quantity_mapping)
     for item_id, quantity in item_quantity_mapping.items():
         try:
             response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
