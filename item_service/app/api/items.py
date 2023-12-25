@@ -49,6 +49,14 @@ def post_item(category_id: int):
 
     req = request.get_json()
 
+    existing_item = Items.query.filter_by(name=req['name'], category_id=category_id).first()
+
+    if existing_item:
+        return {
+            "result": "failed",
+            "message": '존재하는 품목'
+        }, 409
+
     new_item = Items(name=req['name'], category_id=category_id, price=req['price'])
 
     db.session.add(new_item)

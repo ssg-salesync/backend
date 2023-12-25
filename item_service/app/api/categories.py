@@ -36,6 +36,14 @@ def post_category():
 
     req = request.get_json()
 
+    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id).first()
+
+    if existing_category:
+        return {
+            "result": "failed",
+            "message": '존재하는 카테고리'
+        }, 409
+
     new_category = Categories(
         name=req['name'],
         store_id=store_id
