@@ -124,12 +124,19 @@ def get_order():
 
     if not carts:
         old_orders = Orders.query.filter_by(table_no=table_no, paid=False).first()
-        db.session.delete(old_orders)
-        db.session.commit()
+
+        if old_orders:
+            db.session.delete(old_orders)
+            db.session.commit()
+
+            return jsonify({
+                "result": "success",
+                "message": "주문 취소 : 주문 내역 없음"
+            }), 200
 
         return jsonify({
-            "result": "success",
-            "message": "주문 취소 : 주문 내역 없음"
+            "result": "failed",
+            "message": "존재하지 않는 주문"
         }), 200
 
     order = Orders.query.filter_by(table_no=table_no, paid=False).first()
@@ -141,6 +148,7 @@ def get_order():
         }), 404
 
     old_carts = Carts.query.filter_by(order_id=order.order_id).all()
+
     for old_cart in old_carts:
         db.session.delete(old_cart)
         db.session.commit()
