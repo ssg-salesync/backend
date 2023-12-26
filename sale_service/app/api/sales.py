@@ -38,7 +38,7 @@ def post_sale():
 
     req = request.get_json()
 
-    response = requests.put("service-order:5000/orders/paid", json={"table_no": req['table_no'], "store_id": store_id})
+    response = requests.put("service-order:80/orders/paid", json={"table_no": req['table_no'], "store_id": store_id})
 
     if response.status_code != 200:
         return jsonify({
@@ -83,4 +83,3 @@ def delete_sale(sale_id: int):
         "result": "success",
         "message": "결제 취소 성공"
     }), 200
-
