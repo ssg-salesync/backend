@@ -83,3 +83,4 @@ def delete_sale(sale_id: int):
         "result": "success",
         "message": "결제 취소 성공"
     }), 200
+
