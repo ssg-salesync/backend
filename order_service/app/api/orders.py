@@ -252,7 +252,7 @@ def get_items_in_cart(carts):
 
     for item_id, quantity in item_quantity_mapping.items():
         try:
-            response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
+            response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
             response.raise_for_status()
             item = response.json()['item']
 
