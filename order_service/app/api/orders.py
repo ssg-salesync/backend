@@ -1,11 +1,9 @@
 from datetime import datetime
-
-import json
 import requests
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import *
-
 from ..models import db, Orders, Carts
+
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
 
@@ -20,12 +18,6 @@ def create_order():
     carts = req['carts']
 
     if not carts:
-        # db.session.delete(Orders.query.filter_by(table_no=table_no, paid=False).first())
-        # db.session.commit()
-        # return jsonify({
-        #     "result": "success",
-        #     "message": "주문 취소 성공"
-        # }), 200
         return jsonify({
             "result": "failed",
             "message": "주문 등록 실패 : 주문 내역 없음"
@@ -244,8 +236,7 @@ def get_items_in_cart(carts):
             item_quantity_mapping[item_id] = 0
 
         item_quantity_mapping[item_id] += quantity
-    # print(carts)
-    # print(item_quantity_mapping)
+
     for item_id, quantity in item_quantity_mapping.items():
         try:
             response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
