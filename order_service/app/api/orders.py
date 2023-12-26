@@ -92,13 +92,18 @@ def get_unpaids_by_table(table_no: int):
 
 
 @bp.route('/payment', methods=['PUT'])
-@jwt_required()
 def pay():
-    store_id = get_jwt_identity()
     req = request.get_json()
+    store_id = req['store_id']
     table_no = req['table_no']
 
     orders = db.session.query(Orders).filter_by(store_id=store_id, table_no=table_no, paid=False).all()
+
+    if not orders:
+        return jsonify({
+            "result": "failed",
+            "message": "결제 실패 : 존재하지 않는 주문"
+        }), 400
 
     for order in orders:
         order.paid = True
