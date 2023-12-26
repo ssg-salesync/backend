@@ -103,7 +103,7 @@ def pay():
         return jsonify({
             "result": "failed",
             "message": "결제 실패 : 존재하지 않는 주문"
-        }), 200
+        }), 400
 
     for order in orders:
         order.paid = True
