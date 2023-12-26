@@ -66,7 +66,7 @@ def post_item(category_id: int):
         "result": "success",
         "message": "품목 등록 성공",
         "id": new_item.item_id
-    }), 200
+    }), 201
 
 
 # 품목 수정
@@ -77,6 +77,14 @@ def put_item(item_id: int):
     req = request.get_json()
 
     edit_item = Items.query.filter_by(item_id=item_id).first()
+
+    existing_item = Items.query.filter_by(name=req['name'], category_id=edit_item.category_id).first()
+
+    if existing_item:
+        return jsonify({
+            "result": "failed",
+            "message": '존재하는 품목'
+        }), 409
 
     edit_item.name = req['name']
     edit_item.price = req['price']
@@ -111,6 +119,7 @@ def delete_item(item_id: int):
         "message": "품목 삭제 성공",
         "item_id": item.item_id
     }), 200
+
 
 @bp.route('/items/<item_id>', methods=['GET'])
 def get_item_by_id(item_id: int):
