@@ -130,7 +130,7 @@ def get_order():
             db.session.commit()
 
             return jsonify({
-                "result": "success",
+                "result": "cancelled",
                 "message": "주문 취소 : 주문 내역 없음"
             }), 200
 
