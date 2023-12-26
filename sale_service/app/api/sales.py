@@ -38,7 +38,7 @@ def post_sale():
 
     req = request.get_json()
 
-    response = requests.put("http://api.salesync.site/orders/payment", json={"table_no": req['table_no'], "store_id": store_id})
+    response = requests.put("service-order:5000/orders/paid", json={"table_no": req['table_no'], "store_id": store_id})
 
     if response.status_code != 200:
         return jsonify({
