@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import db, Categories, Items
 from flask_jwt_extended import *
+from sqlalchemy import asc
 
 
 bp = Blueprint('items', __name__, url_prefix='/categories')
@@ -13,12 +14,12 @@ def get_item():
 
     store_id = get_jwt_identity()
 
-    categories = Categories.query.filter_by(store_id=store_id).all()
+    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
 
     resp = {"categories": []}
 
     for category in categories:
-        items = Items.query.filter_by(category_id=category.category_id).all()
+        items = Items.query.filter_by(category_id=category.category_id).order_by(asc(Items.item_id)).all()
         
         # 카테고리별 아이템 정보를 담을 딕셔너리
         category_data = {

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import db, Categories
 from flask_jwt_extended import *
+from sqlalchemy import asc
 
 
 bp = Blueprint('categories', __name__, url_prefix='/categories')
@@ -13,10 +14,10 @@ def get_category():
 
     store_id = get_jwt_identity()
 
-    categories = Categories.query.filter_by(store_id=store_id).all()
+    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
 
     return jsonify({
-        "categories" : [
+        "categories": [
             {
                 "id": category.category_id,
                 "name": category.name
