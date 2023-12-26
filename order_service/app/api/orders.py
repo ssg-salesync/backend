@@ -91,7 +91,7 @@ def get_unpaids_by_table(table_no: int):
     }), 200
 
 
-@bp.route('/payment', methods=['PUT'])
+@bp.route('/paid', methods=['PUT'])
 def pay():
     req = request.get_json()
     store_id = req['store_id']
