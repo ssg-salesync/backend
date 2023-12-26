@@ -14,6 +14,9 @@ run_app() {
 }
 
 main() {
+    # shellcheck disable=SC2164
+    cd /salesync/store_service
+
     migrate_status=$(flask db migrate 2>&1)
     if [[ $migrate_status == *"Can't locate revision identified by"* ]]; then
         rollback_and_init_migration
