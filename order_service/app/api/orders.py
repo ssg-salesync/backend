@@ -29,7 +29,7 @@ def create_order():
         return jsonify({
             "result": "failed",
             "message": "신규 주문 등록 실패"
-        }), 404
+        }), 200
 
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
