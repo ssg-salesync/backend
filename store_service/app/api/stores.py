@@ -10,7 +10,7 @@ bp = Blueprint('stores', __name__, url_prefix='/stores')
 bcrypt = Bcrypt()
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('/all', methods=['GET'])
 def get_stores():
     stores = Stores.query.all()
 
@@ -62,9 +62,12 @@ def create_store():
     }), 201
 
 
-@bp.route('/<int:store_id>', methods=['GET'])
-def get_store(store_id):
-    store = Stores.query.get(store_id)
+@bp.route('/', methods=['GET'])
+@jwt_required()
+def get_store():
+    store_id = get_jwt_identity()
+    store = Stores.query.filter_by(store_id=store_id).first()
+
     return jsonify({
         "store": {
             "store_id": store.store_id,
