@@ -86,26 +86,29 @@ def update_store(store_id):
     store = Stores.query.get(store_id)
     data = request.get_json()
 
-    store.username = data['username']
+    # store.username = data['username']
     store.password = generate_password_hash(data['password']).decode('utf-8')
-    store.owner_name = data['owner_name']
-    store.phone = data['phone']
-    store.store_name = data['store_name']
-    store.address = data['address']
-    store.store_type = data['store_type']
+    # store.owner_name = data['owner_name']
+    # store.phone = data['phone']
+    # store.store_name = data['store_name']
+    # store.address = data['address']
+    # store.store_type = data['store_type']
 
     db.session.commit()
 
     return jsonify({
-        "store": {
-            "store_id": store.store_id,
-            "username": store.username,
-            "owner_name": store.owner_name,
-            "phone": store.phone,
-            "store_name": store.store_name,
-            "address": store.address,
-            "store_type": store.store_type
-        }
+        # "store": {
+        #     "store_id": store.store_id,
+        #     "username": store.username,
+        #     "owner_name": store.owner_name,
+        #     "phone": store.phone,
+        #     "store_name": store.store_name,
+        #     "address": store.address,
+        #     "store_type": store.store_type
+        # }
+        "store_id": store.store_id,
+        "result": "success",
+        "message": "매장 정보 수정 성공"
     }), 200
 
 
@@ -157,3 +160,5 @@ def check_username():
             "result": "success",
             "message": "사용 가능한 아이디입니다."
         }), 200
+
+
