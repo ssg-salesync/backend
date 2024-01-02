@@ -81,11 +81,6 @@ def put_item(item_id: int):
 
     existing_item = Items.query.filter_by(name=req['name'], category_id=edit_item.category_id).first()
 
-    if existing_item:
-        return jsonify({
-            "result": "failed",
-            "message": '존재하는 품목'
-        }), 409
 
     edit_item.name = req['name']
     edit_item.price = req['price']
