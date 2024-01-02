@@ -153,8 +153,8 @@ def check_username():
         }), 200
 
 
-@jwt_required()
 @bp.route('/pwcheck', methods=['GET'])
+@jwt_required()
 def check_password():
     store_id = get_jwt_identity()
     store = Stores.query.filter_by(store_id=store_id).first()
