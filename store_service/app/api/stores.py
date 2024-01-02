@@ -97,15 +97,6 @@ def update_store(store_id):
     db.session.commit()
 
     return jsonify({
-        # "store": {
-        #     "store_id": store.store_id,
-        #     "username": store.username,
-        #     "owner_name": store.owner_name,
-        #     "phone": store.phone,
-        #     "store_name": store.store_name,
-        #     "address": store.address,
-        #     "store_type": store.store_type
-        # }
         "store_id": store.store_id,
         "result": "success",
         "message": "매장 정보 수정 성공"
@@ -162,3 +153,22 @@ def check_username():
         }), 200
 
 
+@jwt_required()
+@bp.route('/pwcheck', methods=['GET'])
+def check_password():
+    store_id = get_jwt_identity()
+    store = Stores.query.filter_by(store_id=store_id).first()
+
+    data = request.get_json()
+    password = data['password']
+
+    if not bcrypt.check_password_hash(pw_hash=store.password, password=password):
+        return jsonify({
+            "result": "failed",
+            "message": "비밀번호가 일치하지 않습니다."
+        }), 200
+    else:
+        return jsonify({
+            "result": "success",
+            "message": "비밀번호가 일치합니다."
+        }), 200
