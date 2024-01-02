@@ -153,7 +153,7 @@ def check_username():
         }), 200
 
 
-@bp.route('/pwcheck', methods=['GET'])
+@bp.route('/pwcheck', methods=['POST'])
 @jwt_required()
 def check_password():
     store_id = get_jwt_identity()
