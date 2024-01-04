@@ -3,7 +3,9 @@ import requests
 import xmltodict
 from datetime import datetime
 
+
 bp = Blueprint('weather', __name__, url_prefix='/weather')
+
 
 @bp.route('/', methods=['GET'])
 def getweather():
