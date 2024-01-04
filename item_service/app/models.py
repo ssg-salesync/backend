@@ -14,3 +14,4 @@ class Items(db.Model):
     price = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), nullable=True)
     categories = db.relationship('Categories', backref=db.backref('item_set'))
+    cost = db.Column(db.Integer, nullable=True)
