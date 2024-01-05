@@ -11,7 +11,7 @@ RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 
 RUN pip install wheel
-RUN pip install -r /salesync/dash_service/requirements.txt
+RUN pip install -r /salesync/dashboard_service/requirements.txt
 
 ENV FLASK_APP=app
 ENV FLASK_DEBUG=true
