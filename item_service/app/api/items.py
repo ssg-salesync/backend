@@ -160,10 +160,8 @@ def get_cost():
     }), 200
 
 
-
 @bp.route('/items/costs', methods=['POST'])
 def post_cost():
-    store_id = request.args.get('store_id')
     req = request.get_json()
 
     return_list = []
@@ -182,6 +180,7 @@ def post_cost():
                 "item_id": item.item_id,
                 "name": item.name,
                 "category_id": item.category_id,
+                "category_name": item.category.name,
                 "price": item.price,
                 "cost": item.cost
             }

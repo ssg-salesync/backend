@@ -14,7 +14,6 @@ def get_costs():
     return requests.get(f'http://service-item.default.svc.cluster.local/categories/items/costs?store_id={store_id}').json()
 
 
-
 @bp.route('/costs', methods=['POST'])
 @jwt_required()
 def post_costs():
