@@ -29,4 +29,3 @@ def put_costs(item_id: int):
     req = request.get_json()
 
     return requests.put(f'http://service-item.default.svc.cluster.local/categories/items/costs/{item_id}', json=req)
-
