@@ -79,9 +79,6 @@ def put_item(item_id: int):
 
     edit_item = Items.query.filter_by(item_id=item_id).first()
 
-    existing_item = Items.query.filter_by(name=req['name'], category_id=edit_item.category_id).first()
-
-
     edit_item.name = req['name']
     edit_item.price = req['price']
 
@@ -193,3 +190,23 @@ def post_cost():
     }), 200
 
 
+@bp.route('/items/costs/<item_id>', methods=['PUT'])
+def update_cost(item_id: int):
+    req = request.get_json()
+
+    item = Items.query.filter_by(item_id=item_id).first()
+
+    item.cost = req['cost']
+    db.session.commit()
+
+    return jsonify({
+        "result": "success",
+        "message": "원가 수정 성공",
+        "item": {
+            "item_id": item.item_id,
+            "name": item.name,
+            "category_id": item.category_id,
+            "price": item.price,
+            "cost": item.cost
+        }
+    }), 200
