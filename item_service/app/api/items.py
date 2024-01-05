@@ -130,3 +130,66 @@ def get_item_by_id(item_id: int):
             "price": item.price
         }
     }), 200
+
+
+@bp.route('/items/costs', methods=['GET'])
+def get_cost():
+    store_id = request.args.get('store_id')
+
+    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
+
+    items = []
+
+    for category in categories:
+        items_per_category = Items.query.filter_by(category_id=category.category_id).order_by(asc(Items.item_id)).all()
+
+        for item in items_per_category:
+            items.append(item)
+
+
+    return jsonify({
+        "result": "success",
+        "message": "원가 조회 성공",
+        "items": [
+            {
+                "item_id": item.item_id,
+                "name": item.name,
+                "category_id": item.category_id,
+                "price": item.price,
+                "cost": item.cost
+            }
+            for item in items
+        ]
+    }), 200
+
+
+
+@bp.route('/items/costs', methods=['POST'])
+def post_cost():
+    store_id = request.args.get('store_id')
+    req = request.get_json()
+
+    return_list = []
+
+    for i in range(len(req['items'])):
+        item = Items.query.filter_by(item_id=req['items'][i]['item_id']).first()
+        item.cost = req['items'][i]['cost']
+        db.session.commit()
+        return_list.append(item)
+
+    return jsonify({
+        "result": "success",
+        "message": "원가 등록 성공",
+        "items": [
+            {
+                "item_id": item.item_id,
+                "name": item.name,
+                "category_id": item.category_id,
+                "price": item.price,
+                "cost": item.cost
+            }
+            for item in return_list
+        ]
+    }), 200
+
+

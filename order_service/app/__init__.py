@@ -35,9 +35,10 @@ def create_app():
     jwt.init_app(app)
     migration.init_app(app, db)
 
-    from .api import orders, main
+    from .api import orders, main, weather
 
     app.register_blueprint(orders.bp)
     app.register_blueprint(main.bp)
+    app.register_blueprint(weather.bp)
 
     return app
