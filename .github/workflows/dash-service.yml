@@ -1,0 +1,73 @@
+name: Build and Push Dashboard Service to ECR
+
+on:
+  push:
+    paths:
+      - 'dashboard_service/**'
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Bump Version and Push Tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.1
+      with:
+        github_token: ${{ secrets.PAT }}
+
+    - name: Create a GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
+      with:
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+        body: ${{ steps.tag_version.outputs.changelog }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and Push Docker Image to ECR
+      run: |
+        docker build -t ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_DASH_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }} -f Dockerfile-dash --platform linux/amd64 .
+        docker push ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_DASH_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }}
+
+    - name: Checkout for Kustomize Repository
+      uses: actions/checkout@v3
+      with:
+        repository: ssg-salesync/cicd
+        ref: main
+        token: ${{ secrets.PAT }}
+        path: cicd
+
+    - name: Update Kubernetes Resources
+      run: |
+        pwd
+        cd cicd/overlays/prd/
+        kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/dash-service=${{ steps.login-ecr.outputs.registry }}/dash-service:${{ steps.tag_version.outputs.new_tag }} 
+        cat kustomization.yaml
+
+    - name: Commit Manifest Files
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
+      run: |
+        cd cicd
+        git config --global user.email "21storeo@gmail.com"
+        git config --global user.name "seungwonbased"
+        git config --global github.token ${{ secrets.PAT }}
+        git commit -am "Update Image Tag ${{ steps.tag_version.outputs.new_tag }}"
+        git push -u origin main
