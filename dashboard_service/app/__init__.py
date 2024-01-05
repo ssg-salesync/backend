@@ -6,8 +6,6 @@ from flask_cors import CORS
 jwt = JWTManager()
 
 
-
-
 def create_app():
     app = Flask(__name__)
     app.config.from_envvar('APP_CONFIG_FILE')
