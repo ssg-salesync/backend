@@ -25,6 +25,16 @@ def create_order():
             "message": "주문 등록 실패 : 주문 내역 없음"
         }), 200
 
+
+    existing_order = Orders.query.filter_by(table_no=table_no, paid=False).first()
+
+    if existing_order:
+        return jsonify({
+            "result": "failed",
+            "message": "신규 주문 등록 실패: 이미 존재하는 테이블"
+        }), 200
+
+
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
     db.session.commit()
@@ -122,10 +132,10 @@ def get_order():
     carts = req['carts']
 
     if not carts:
-        old_orders = Orders.query.filter_by(table_no=table_no, paid=False).first()
+        old_order = Orders.query.filter_by(table_no=table_no, paid=False).first()
 
-        if old_orders:
-            db.session.delete(old_orders)
+        if old_order:
+            db.session.delete(old_order)
             db.session.commit()
 
             return jsonify({
@@ -140,23 +150,11 @@ def get_order():
 
     order = Orders.query.filter_by(table_no=table_no, paid=False).first()
 
-    if not order:
-        return jsonify({
-            "result": "failed",
-            "message": "존재하지 않는 주문"
-        }), 404
-
     old_carts = Carts.query.filter_by(order_id=order.order_id).all()
 
     for old_cart in old_carts:
         db.session.delete(old_cart)
         db.session.commit()
-    db.session.delete(order)
-    db.session.commit()
-
-    order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
-    db.session.add(order)
-    db.session.commit()
 
     for cart in carts:
         item_id = cart['item_id']
