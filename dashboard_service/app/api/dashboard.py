@@ -11,7 +11,8 @@ bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 def get_costs():
     store_id = get_jwt_identity()
 
-    return requests.get(f'http://service-item.default.svc.cluster.local/categories/items/costs?store_id={store_id}')
+    return requests.get(f'http://service-item.default.svc.cluster.local/categories/items/costs?store_id={store_id}').json()
+
 
 
 @bp.route('/costs', methods=['POST'])
@@ -20,7 +21,7 @@ def post_costs():
     store_id = get_jwt_identity()
     req = request.get_json()
 
-    return requests.post(f'http://service-item.default.svc.cluster.local/categories/items/costs?store_id={store_id}', json=req)
+    return requests.post(f'http://service-item.default.svc.cluster.local/categories/items/costs?store_id={store_id}', json=req).json()
 
 
 @bp.route('/costs/<item_id>', methods=['PUT'])
@@ -28,4 +29,4 @@ def post_costs():
 def put_costs(item_id: int):
     req = request.get_json()
 
-    return requests.put(f'http://service-item.default.svc.cluster.local/categories/items/costs/{item_id}', json=req)
+    return requests.put(f'http://service-item.default.svc.cluster.local/categories/items/costs/{item_id}', json=req).json()
