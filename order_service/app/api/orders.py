@@ -23,15 +23,6 @@ def create_order():
             "message": "주문 등록 실패 : 주문 내역 없음"
         }), 200
 
-    # existing_order = Orders.query.filter_by(table_no=table_no, paid=False).first()
-    # print(existing_order)
-    #
-    # if existing_order:
-    #     return jsonify({
-    #         "result": "failed",
-    #         "message": "신규 주문 등록 실패"
-    #     }), 200
-
     order = Orders(store_id=store_id, table_no=table_no, order_date=datetime.now(), paid=False)
     db.session.add(order)
     db.session.commit()
