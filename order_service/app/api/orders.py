@@ -183,6 +183,28 @@ def delete_order(table_no: int):
     }), 200
 
 
+@bp.route('/daily', methods=['GET'])
+def get_sales_per_date():
+
+    store_id = request.args.get('store_id')
+    date_str = request.args.get('date')  # 2024-01-04
+    date = datetime.strptime(date_str, '%Y-%m-%d')
+
+    orders = Orders.query.filter_by(store_id=store_id).filter(
+        db.func.date(Orders.order_date) == db.func.date(date)
+    ).all()
+
+    cart_in_order = get_carts_in_order(orders)
+
+    return jsonify({
+        "result": "success",
+        "message": "주문별 매출 조회 성공",
+        "store_id": f"{store_id}",
+        "date": date_str,
+        "orders": cart_in_order
+    }), 200
+
+
 def get_carts_in_order(orders):
     cart_in_order = {}
 
