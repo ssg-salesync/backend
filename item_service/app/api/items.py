@@ -180,7 +180,6 @@ def post_cost():
                 "item_id": item.item_id,
                 "name": item.name,
                 "category_id": item.category_id,
-                "category_name": item.category.name,
                 "price": item.price,
                 "cost": item.cost
             }
