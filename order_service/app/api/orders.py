@@ -195,6 +195,7 @@ def get_sales_per_date():
     ).all()
 
     cart_in_order = get_carts_in_order(orders)
+    print(cart_in_order)
 
     return jsonify({
         "result": "success",
