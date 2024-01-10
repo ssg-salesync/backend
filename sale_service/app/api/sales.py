@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import *
 from ..models import db, Sales
 from sqlalchemy import asc
-import datetime
+
 
 
 bp = Blueprint('sales', __name__, url_prefix='/sales')
@@ -90,7 +90,7 @@ def delete_sale(sale_id: int):
 @bp.route('/daily', methods=['GET'])
 def get_daily_sales():
     store_id = request.args.get('store_id')
-    date = datetime.datetime.strptime(request.args.get('date'), '%Y-%m-%d').date()
+    date = datetime.strptime(request.args.get('date'), '%Y-%m-%d').date()
 
     sales = Sales.query.filter_by(store_id=store_id).filter(
         db.func.date(Sales.sale_date) == date
