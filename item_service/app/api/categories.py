@@ -14,7 +14,7 @@ def get_category():
 
     store_id = get_jwt_identity()
 
-    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
+    categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
 
     return jsonify({
         "categories": [
@@ -37,7 +37,7 @@ def post_category():
 
     req = request.get_json()
 
-    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id).first()
+    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
     if existing_category:
         return {
@@ -77,7 +77,7 @@ def put_category(category_id: int):
 
     req = request.get_json()
 
-    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id).first()
+    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
     if existing_category:
         return {
@@ -108,7 +108,8 @@ def delete_category(category_id: int):
             "message": '카테고리가 존재하지 않습니다.'
         }, 404
 
-    db.session.query(Categories).filter_by(category_id=category_id).delete()
+    category = db.session.query(Categories).filter_by(category_id=category_id)
+    category.enabled = False
 
     db.session.commit()
 

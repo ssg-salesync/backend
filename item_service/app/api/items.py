@@ -11,15 +11,13 @@ bp = Blueprint('items', __name__, url_prefix='/categories')
 @bp.route('/items', methods=['GET'])
 @jwt_required()
 def get_item():
-
     store_id = get_jwt_identity()
-
-    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
+    categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
 
     resp = {"categories": []}
 
     for category in categories:
-        items = Items.query.filter_by(category_id=category.category_id).order_by(asc(Items.item_id)).all()
+        items = Items.query.filter_by(category_id=category.category_id, enabled=True).order_by(asc(Items.item_id)).all()
         
         # 카테고리별 아이템 정보를 담을 딕셔너리
         category_data = {
@@ -47,10 +45,9 @@ def get_item():
 @bp.route('/<category_id>/items', methods=['POST'])
 @jwt_required()
 def post_item(category_id: int):
-
     req = request.get_json()
 
-    existing_item = Items.query.filter_by(name=req['name'], category_id=category_id).first()
+    existing_item = Items.query.filter_by(name=req['name'], category_id=category_id, enabled=True).first()
 
     if existing_item:
         return {
@@ -74,7 +71,6 @@ def post_item(category_id: int):
 @bp.route('/items/<item_id>', methods=['PUT'])
 @jwt_required()
 def put_item(item_id: int):
-        
     req = request.get_json()
 
     edit_item = Items.query.filter_by(item_id=item_id).first()
@@ -95,16 +91,15 @@ def put_item(item_id: int):
 @bp.route('/items/<item_id>', methods=['DELETE'])
 @jwt_required()
 def delete_item(item_id: int):
-
-    item = Items.query.filter_by(item_id=item_id).first()
+    item = Items.query.filter_by(item_id=item_id, enabled=True).first()
 
     if item is None:
         return {
             "result": "failed",
             "message": '품목이 존재하지 않습니다.'
         }, 404
-    
-    db.session.delete(item)
+
+    item.enabled = False
     db.session.commit()
 
     return jsonify({
@@ -116,7 +111,7 @@ def delete_item(item_id: int):
 
 @bp.route('/items/<item_id>', methods=['GET'])
 def get_item_by_id(item_id: int):
-    item = Items.query.filter_by(item_id=item_id).first()
+    item = Items.query.filter_by(item_id=item_id, enabled=True).first()
 
     return jsonify({
         "result": "success",
@@ -133,13 +128,13 @@ def get_item_by_id(item_id: int):
 def get_cost():
     store_id = request.args.get('store_id')
 
-    categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
+    categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
     categories_val = dict((category.category_id, category.name) for category in categories)
 
     items = []
 
     for category in categories:
-        items_per_category = Items.query.filter_by(category_id=category.category_id).order_by(asc(Items.item_id)).all()
+        items_per_category = Items.query.filter_by(category_id=category.category_id, enabled=True).order_by(asc(Items.item_id)).all()
 
         for item in items_per_category:
             category_name = categories_val.get(item.category_id)
