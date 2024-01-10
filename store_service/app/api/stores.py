@@ -126,7 +126,7 @@ def login():
     if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
         return jsonify({'error': 'Invalid username or password'}), 400
 
-    access_token = create_access_token(identity=store.store_id)
+    access_token = create_access_token(identity=store.store_id, )
 
     return jsonify({
         'result': "success",
