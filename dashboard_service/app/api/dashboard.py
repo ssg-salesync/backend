@@ -31,7 +31,7 @@ def put_costs(item_id: int):
     return requests.put(f'http://service-item.default.svc.cluster.local/categories/items/costs/{item_id}', json=req).json()
 
 
-@bp.route('/daily-sales', methods=['GET'])
+@bp.route('/daily', methods=['GET'])
 @jwt_required()
 def get_sales_per_date():
     store_id = get_jwt_identity()
