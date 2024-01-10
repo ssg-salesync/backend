@@ -52,7 +52,7 @@ def get_sale_per_category():
         order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/daily', params={'store_id': store_id, 'date': start}).json() # carts.item_id, carts.quantity
 
         # item service (item, category) 에 해당하는 데이터 가져오기
-        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', params={'store_id': store_id}).json()
+        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers, params={'store_id': store_id}).json()
 
         items = get_items_in_orders(order_resp, item_resp)
 
@@ -68,7 +68,28 @@ def get_sale_per_category():
 
     else:
         # 기간
-        print(start, end)
+        # sale service (sale) 에 해당하는 데이터 가져오기
+        sale_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/period',
+                                 params={'store_id': store_id, 'start': start, 'end': end}).json()  # sale_volume
+
+        # order service (order, cart) 에 해당하는 데이터 가져오기
+        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
+                                  params={'store_id': store_id, 'start': start, 'end': end}).json()  # carts.item_id, carts.quantity
+
+        # item service (item, category) 에 해당하는 데이터 가져오기
+        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers,
+                                 params={'store_id': store_id}).json()
+
+        items = get_items_in_orders(order_resp, item_resp)
+
+        return jsonify({
+            "result": "success",
+            "message": "하루 매출 조회 성공",
+            "start_date": start,
+            "end_date": end,
+            "sales_volume": sale_resp['sales_volume'],
+            "items": items
+        }), 200
 
 
 def get_items_in_orders(order_resp, item_resp):
@@ -106,12 +127,3 @@ def get_items_in_orders(order_resp, item_resp):
             pass
 
     return items
-
-
-@bp.route('/daily', methods=['GET'])
-@jwt_required()
-def get_sales_per_date():
-    store_id = get_jwt_identity()
-    date = request.args.get('date')
-
-    return requests.get(f'http://service-order.default.svc.cluster.local/orders/daily', params={'store_id': store_id, 'date': date}).json()
