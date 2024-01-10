@@ -146,7 +146,6 @@ def get_cost():
             item.category_name = category_name
             items.append(item)
 
-
     return jsonify({
         "result": "success",
         "message": "원가 조회 성공",
