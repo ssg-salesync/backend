@@ -109,3 +109,29 @@ def get_daily_sales():
         "date": date
     }), 200
 
+
+# 기간별 매출 조회
+@bp.route('/period', methods=['GET'])
+def get_period_sales():
+    store_id = request.args.get('store_id')
+    start = datetime.strptime(request.args.get('start'), '%Y-%m-%d').date()
+    end = datetime.strptime(request.args.get('end'), '%Y-%m-%d').date()
+
+    sales = Sales.query.filter_by(store_id=store_id).filter(
+        db.func.date(Sales.sale_date) >= start
+    ).filter(
+        db.func.date(Sales.sale_date) <= end
+    ).all()
+
+    sales_volume = 0
+
+    for sale in sales:
+        sales_volume += sale.total_price
+
+    return jsonify({
+        "result": "success",
+        "message": "기간별 매출 조회 성공",
+        "sales_volume": sales_volume,
+        "start_date": start,
+        "end_date": end
+    }), 200

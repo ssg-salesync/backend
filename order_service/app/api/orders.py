@@ -187,7 +187,7 @@ def delete_order(table_no: int):
 
 
 @bp.route('/daily', methods=['GET'])
-def get_sales_per_date():
+def get_orders_per_date():
 
     store_id = request.args.get('store_id')
     date_str = request.args.get('date')  # 2024-01-04
@@ -204,6 +204,34 @@ def get_sales_per_date():
         "message": "주문별 매출 조회 성공",
         "store_id": f"{store_id}",
         "date": date_str,
+        "orders": cart_in_order
+    }), 200
+
+
+# 기간별 매출 조회
+@bp.route('/period', methods=['GET'])
+def get_sales_per_period():
+    store_id = request.args.get('store_id')
+    start_str = request.args.get('start')
+    end_str = request.args.get('end')
+
+    start = datetime.strptime(start_str, '%Y-%m-%d')
+    end = datetime.strptime(end_str, '%Y-%m-%d')
+
+    orders = Orders.query.filter_by(store_id=store_id).filter(
+        db.func.date(Orders.order_date) >= db.func.date(start)
+    ).filter(
+        db.func.date(Orders.order_date) <= db.func.date(end)
+    ).all()
+
+    cart_in_order = get_carts_in_order(orders)
+
+    return jsonify({
+        "result": "success",
+        "message": "기간별 매출 조회 성공",
+        "store_id": f"{store_id}",
+        "start_date": start_str,
+        "end_date": end_str,
         "orders": cart_in_order
     }), 200
 
@@ -259,7 +287,8 @@ def get_items_in_cart(carts):
 
     for item_id, quantity in item_quantity_mapping.items():
         try:
-            response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            # response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
             response.raise_for_status()
             item = response.json()['item']
 
