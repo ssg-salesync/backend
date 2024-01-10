@@ -195,6 +195,7 @@ def get_sales_per_date():
     ).all()
 
     cart_in_order = get_carts_in_order(orders)
+    print(cart_in_order)
 
     return jsonify({
         "result": "success",
@@ -256,7 +257,8 @@ def get_items_in_cart(carts):
 
     for item_id, quantity in item_quantity_mapping.items():
         try:
-            response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            # response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            response = requests.get(f'http://api.salesync.site/categories/items/{item_id}')
             response.raise_for_status()
             item = response.json()['item']
 
