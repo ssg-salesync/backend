@@ -108,7 +108,7 @@ def delete_category(category_id: int):
             "message": '카테고리가 존재하지 않습니다.'
         }, 404
 
-    category = db.session.query(Categories).filter_by(category_id=category_id)
+    # category = db.session.query(Categories).filter_by(category_id=category_id)
     category.enabled = False
 
     db.session.commit()
