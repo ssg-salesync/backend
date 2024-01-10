@@ -49,7 +49,9 @@ def create_order():
 @jwt_required()
 def get_unpaids():
     store_id = get_jwt_identity()
+
     orders = db.session.query(Orders).filter_by(store_id=store_id, paid=False).all()
+
     cart_in_order = get_carts_in_order(orders)
 
     return jsonify({
@@ -122,7 +124,7 @@ def get_order():
     carts = req['carts']
 
     if not carts:
-        old_order = Orders.query.filter_by(table_no=table_no, paid=False).first()
+        old_order = Orders.query.filter_by(store_id=store_id, table_no=table_no, paid=False).first()
 
         if old_order:
             db.session.delete(old_order)
@@ -138,7 +140,7 @@ def get_order():
             "message": "존재하지 않는 주문"
         }), 200
 
-    order = Orders.query.filter_by(table_no=table_no, paid=False).first()
+    order = Orders.query.filter_by(store_id=store_id, table_no=table_no, paid=False).first()
 
     old_carts = Carts.query.filter_by(order_id=order.order_id).all()
 
@@ -165,8 +167,9 @@ def get_order():
 @bp.route('/<table_no>', methods=['DELETE'])
 @jwt_required()
 def delete_order(table_no: int):
+    store_id = get_jwt_identity()
 
-    orders = Orders.query.filter_by(table_no=table_no, paid=False).all()
+    orders = Orders.query.filter_by(store_id=store_id, table_no=table_no, paid=False).all()
 
     order_ids = []
 

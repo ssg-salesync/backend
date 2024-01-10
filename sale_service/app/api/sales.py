@@ -6,6 +6,7 @@ from ..models import db, Sales
 from sqlalchemy import asc
 
 
+
 bp = Blueprint('sales', __name__, url_prefix='/sales')
 
 
@@ -83,3 +84,28 @@ def delete_sale(sale_id: int):
         "result": "success",
         "message": "결제 취소 성공"
     }), 200
+
+
+# 하루 매출 조회
+@bp.route('/daily', methods=['GET'])
+def get_daily_sales():
+    store_id = request.args.get('store_id')
+    date = datetime.strptime(request.args.get('date'), '%Y-%m-%d').date()
+
+    sales = Sales.query.filter_by(store_id=store_id).filter(
+        db.func.date(Sales.sale_date) == date
+    ).all()
+    print(sales)
+
+    sales_volume = 0
+
+    for sale in sales:
+        sales_volume += sale.total_price
+
+    return jsonify({
+        "result": "success",
+        "message": "하루 매출 조회 성공",
+        "sales_volume": sales_volume,
+        "date": date
+    }), 200
+
