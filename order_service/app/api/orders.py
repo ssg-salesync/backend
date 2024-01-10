@@ -13,8 +13,7 @@ bp = Blueprint('orders', __name__, url_prefix='/orders')
 @bp.route('/', methods=['POST'])
 @jwt_required()
 def create_order():
-    # store_id = get_jwt_identity()
-    store_id = request.args.get('store_id')
+    store_id = get_jwt_identity()
     req = request.get_json()
 
     table_no = req['table_no']
