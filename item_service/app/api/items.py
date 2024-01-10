@@ -134,6 +134,7 @@ def get_cost():
     store_id = request.args.get('store_id')
 
     categories = Categories.query.filter_by(store_id=store_id).order_by(asc(Categories.category_id)).all()
+    categories_val = dict((category.category_id, category.name) for category in categories)
 
     items = []
 
@@ -141,6 +142,8 @@ def get_cost():
         items_per_category = Items.query.filter_by(category_id=category.category_id).order_by(asc(Items.item_id)).all()
 
         for item in items_per_category:
+            category_name = categories_val.get(item.category_id)
+            item.category_name = category_name
             items.append(item)
 
 
@@ -152,6 +155,7 @@ def get_cost():
                 "item_id": item.item_id,
                 "name": item.name,
                 "category_id": item.category_id,
+                "category_name": item.category_name,
                 "price": item.price,
                 "cost": item.cost
             }
