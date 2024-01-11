@@ -121,7 +121,7 @@ def get_items_in_orders(order_resp, item_resp):
                 "item_id": item_id,
                 "name": items_data[item_id]['name'],
                 "sales_volume": items_data[item_id]['price'] * quantity,
-                "profit": items_data[item_id]['price'] * quantity - items_data[item_id]['cost'] * quantity,
+                "profit": items_data[item_id]['price'] * quantity - items_data[item_id].get('cost', 0) * quantity,
                 "quantity": quantity
             })
         else:
