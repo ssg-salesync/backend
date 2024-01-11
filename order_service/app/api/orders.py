@@ -4,7 +4,6 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import *
 from ..models import db, Orders, Carts
 import requests
-import xmltodict
 
 
 bp = Blueprint('orders', __name__, url_prefix='/orders')
