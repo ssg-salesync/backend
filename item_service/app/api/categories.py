@@ -7,7 +7,6 @@ from sqlalchemy import asc
 bp = Blueprint('categories', __name__, url_prefix='/categories')
 
 
-# 카테고리 조회
 @bp.route('/', methods=['GET'])
 @jwt_required()
 def get_category():
@@ -26,7 +25,6 @@ def get_category():
     }), 200
 
 
-# 카테고리 등록
 @bp.route('/', methods=['POST'])
 @jwt_required()
 def post_category():
@@ -55,7 +53,6 @@ def post_category():
     }), 201
 
 
-# 카테고리 수정
 @bp.route('/<int:category_id>', methods=['PUT'])
 @jwt_required()
 def put_category(category_id: int):
@@ -87,7 +84,6 @@ def put_category(category_id: int):
     }), 201
 
 
-# 카테고리 삭제
 @bp.route('/<int:category_id>', methods=['DELETE'])
 def delete_category(category_id: int):
     category = Categories.query.filter_by(category_id=category_id).first()

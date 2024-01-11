@@ -85,14 +85,7 @@ def get_store():
 def update_store(store_id):
     store = Stores.query.get(store_id)
     data = request.get_json()
-
-    # store.username = data['username']
     store.password = generate_password_hash(data['password']).decode('utf-8')
-    # store.owner_name = data['owner_name']
-    # store.phone = data['phone']
-    # store.store_name = data['store_name']
-    # store.address = data['address']
-    # store.store_type = data['store_type']
 
     db.session.commit()
 

@@ -9,7 +9,6 @@ from sqlalchemy import asc
 bp = Blueprint('sales', __name__, url_prefix='/sales')
 
 
-# 전체 매출 조회
 @bp.route('/', methods=['GET'])
 @jwt_required()
 def get_sales():
@@ -30,7 +29,6 @@ def get_sales():
     }), 200
 
 
-# 결제 등록
 @bp.route('/', methods=['POST'])
 @jwt_required()
 def post_sale():
@@ -64,7 +62,6 @@ def post_sale():
     }), 201
 
 
-# 결제 취소
 @bp.route('/<int:sale_id>', methods=['DELETE'])
 @jwt_required()
 def delete_sale(sale_id: int):
@@ -86,7 +83,6 @@ def delete_sale(sale_id: int):
     }), 200
 
 
-# 하루 매출 조회
 @bp.route('/daily', methods=['GET'])
 def get_daily_sales():
     store_id = request.args.get('store_id')
@@ -110,7 +106,6 @@ def get_daily_sales():
     }), 200
 
 
-# 기간별 매출 조회
 @bp.route('/period', methods=['GET'])
 def get_period_sales():
     store_id = request.args.get('store_id')
