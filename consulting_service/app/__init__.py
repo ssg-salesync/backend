@@ -2,13 +2,11 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
-from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
 
 migration = Migrate()
-bcrypt = Bcrypt()
 jwt = JWTManager()
 
 
@@ -31,7 +29,6 @@ def create_app():
     CORS(app, resources={r"/*": {"origins": "*"}})
 
     db.init_app(app)
-    bcrypt.init_app(app)
     jwt.init_app(app)
     migration.init_app(app, db)
 

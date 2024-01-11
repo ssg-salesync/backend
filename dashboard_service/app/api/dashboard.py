@@ -46,10 +46,10 @@ def get_sale_per_category():
 
     if start == end:
         # sale service (sale) 에 해당하는 데이터 가져오기
-        sale_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily', params={'store_id': store_id, 'date': start}).json() # sale_volume
+        sale_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily', params={'store_id': store_id, 'date': start}).json()
 
         # order service (order, cart) 에 해당하는 데이터 가져오기
-        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/daily', params={'store_id': store_id, 'date': start}).json() # carts.item_id, carts.quantity
+        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/daily', params={'store_id': store_id, 'date': start}).json()
 
         # item service (item, category) 에 해당하는 데이터 가져오기
         item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers, params={'store_id': store_id}).json()
@@ -64,8 +64,6 @@ def get_sale_per_category():
             "sales_volume": sale_resp['sales_volume'],
             "items": items
         }), 200
-
-
     else:
         # 기간
         # sale service (sale) 에 해당하는 데이터 가져오기
@@ -121,7 +119,7 @@ def get_items_in_orders(order_resp, item_resp):
             items.append({
                 "item_id": item_id,
                 "name": items_data[item_id]['name'],
-                "price": items_data[item_id]['price'] * quantity
+                "sales_volume": items_data[item_id]['price'] * quantity
             })
         else:
             pass
