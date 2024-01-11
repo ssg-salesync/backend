@@ -6,7 +6,6 @@ from ..models import db, Sales
 from sqlalchemy import asc
 
 
-
 bp = Blueprint('sales', __name__, url_prefix='/sales')
 
 
@@ -39,7 +38,8 @@ def post_sale():
 
     req = request.get_json()
 
-    response = requests.put("http://service-order.default.svc.cluster.local/orders/paid", json={"table_no": req['table_no'], "store_id": store_id})
+    response = requests.put("http://service-order.default.svc.cluster.local/orders/paid",
+                            json={"table_no": req['table_no'], "store_id": store_id})
 
     if response.status_code != 200:
         return jsonify({
