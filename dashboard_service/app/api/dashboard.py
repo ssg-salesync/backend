@@ -54,6 +54,7 @@ def get_sale_per_category():
         # item service (item, category) 에 해당하는 데이터 가져오기
         item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers, params={'store_id': store_id}).json()
 
+
         items = get_items_in_orders(order_resp, item_resp)
 
         return jsonify({
@@ -119,7 +120,8 @@ def get_items_in_orders(order_resp, item_resp):
             items.append({
                 "item_id": item_id,
                 "name": items_data[item_id]['name'],
-                "sales_volume": items_data[item_id]['price'] * quantity
+                "sales_volume": items_data[item_id]['price'] * quantity,
+                "profit": items_data[item_id]['price'] * quantity - items_data[item_id]['cost'] * quantity
             })
         else:
             pass
