@@ -7,6 +7,7 @@ from ..models import db, ConsultingRequestIds
 from flask_jwt_extended import *
 import requests
 import uuid
+from ..kafka.producer import send_message
 
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
@@ -37,7 +38,12 @@ async def get_consulting():
     매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}')
 
     result = await send_prompt_to_gpt_async(req_id, prompt)
-    asyncio.run(send_prompt_to_gpt_async(req_id, prompt))
+    # asyncio.run(send_prompt_to_gpt_async(req_id, prompt))
+
+    # kafka 메시지 보내기 (producer)
+    message = {'req_id': req_id, 'result': result}
+    send_message("consulting", message)
+
 
     return jsonify({
         "req_id": req_id

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import *
 import requests
+from ..kafka.consumer import consume_message
 
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -119,3 +120,14 @@ def get_items_in_orders(order_resp, item_resp):
             pass
 
     return items
+
+
+@bp.route('/consulting', methods=['GET'])
+@jwt_required()
+def get_consulting():
+    return jsonify({
+        "result": "success",
+        "message": "상담 요청 조회 성공",
+        "consulting_requests": consume_message("consulting")
+    }), 200
+
