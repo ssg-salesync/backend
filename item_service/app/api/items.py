@@ -28,7 +28,8 @@ def get_item():
             item_data = {
                 "item_id": item.item_id,
                 "name": item.name,
-                "price": item.price
+                "price": item.price,
+                "cost": item.cost
             }
             category_data['items'].append(item_data)
 

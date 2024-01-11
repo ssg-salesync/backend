@@ -2,7 +2,6 @@ FROM ubuntu:20.04
 
 WORKDIR /salesync
 
-COPY models /salesync/models
 COPY order_service /salesync/order_service
 
 RUN apt-get update -y
