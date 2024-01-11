@@ -13,13 +13,11 @@ bp = Blueprint('items', __name__, url_prefix='/categories')
 def get_item():
     store_id = get_jwt_identity()
     categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
-
     resp = {"categories": []}
 
     for category in categories:
         items = Items.query.filter_by(category_id=category.category_id, enabled=True).order_by(asc(Items.item_id)).all()
-        
-        # 카테고리별 아이템 정보를 담을 딕셔너리
+
         category_data = {
             "category_id": category.category_id,
             "category_name": category.name,
@@ -27,17 +25,15 @@ def get_item():
         }
 
         for item in items:
-            # 아이템 정보를 담을 딕셔너리
             item_data = {
                 "item_id": item.item_id,
                 "name": item.name,
                 "price": item.price
             }
             category_data['items'].append(item_data)
-        
-        # 카테고리 정보를 리스트에 추가
+
         resp['categories'].append(category_data)
-    
+
     return jsonify(resp), 200
 
 
@@ -46,7 +42,6 @@ def get_item():
 @jwt_required()
 def post_item(category_id: int):
     req = request.get_json()
-
     existing_item = Items.query.filter_by(name=req['name'], category_id=category_id, enabled=True).first()
 
     if existing_item:
@@ -56,7 +51,6 @@ def post_item(category_id: int):
         }, 409
 
     new_item = Items(name=req['name'], category_id=category_id, price=req['price'])
-
     db.session.add(new_item)
     db.session.commit()
 
@@ -72,12 +66,9 @@ def post_item(category_id: int):
 @jwt_required()
 def put_item(item_id: int):
     req = request.get_json()
-
     edit_item = Items.query.filter_by(item_id=item_id).first()
-
     edit_item.name = req['name']
     edit_item.price = req['price']
-
     db.session.commit()
 
     return jsonify({
@@ -127,10 +118,8 @@ def get_item_by_id(item_id: int):
 @bp.route('/items/costs', methods=['GET'])
 def get_cost():
     store_id = request.args.get('store_id')
-
     categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
     categories_val = dict((category.category_id, category.name) for category in categories)
-
     items = []
 
     for category in categories:
@@ -161,7 +150,6 @@ def get_cost():
 @bp.route('/items/costs', methods=['POST'])
 def post_cost():
     req = request.get_json()
-
     return_list = []
 
     for i in range(len(req['items'])):
@@ -189,9 +177,7 @@ def post_cost():
 @bp.route('/items/costs/<item_id>', methods=['PUT'])
 def update_cost(item_id: int):
     req = request.get_json()
-
     item = Items.query.filter_by(item_id=item_id).first()
-
     item.cost = req['cost']
     db.session.commit()
 

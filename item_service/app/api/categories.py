@@ -11,9 +11,7 @@ bp = Blueprint('categories', __name__, url_prefix='/categories')
 @bp.route('/', methods=['GET'])
 @jwt_required()
 def get_category():
-
     store_id = get_jwt_identity()
-
     categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
 
     return jsonify({
@@ -32,11 +30,8 @@ def get_category():
 @bp.route('/', methods=['POST'])
 @jwt_required()
 def post_category():
-    
     store_id = get_jwt_identity()
-
     req = request.get_json()
-
     existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
     if existing_category:
@@ -64,9 +59,7 @@ def post_category():
 @bp.route('/<int:category_id>', methods=['PUT'])
 @jwt_required()
 def put_category(category_id: int):
-
     store_id = get_jwt_identity()
-
     category = Categories.query.filter_by(category_id=category_id).first()
 
     if category is None:
@@ -76,7 +69,6 @@ def put_category(category_id: int):
         }, 404
 
     req = request.get_json()
-
     existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
     if existing_category:
@@ -86,7 +78,6 @@ def put_category(category_id: int):
         }, 409
 
     category.name = req['name']
-
     db.session.commit()
 
     return jsonify({
@@ -99,7 +90,6 @@ def put_category(category_id: int):
 # 카테고리 삭제
 @bp.route('/<int:category_id>', methods=['DELETE'])
 def delete_category(category_id: int):
-
     category = Categories.query.filter_by(category_id=category_id).first()
 
     if category is None:
@@ -108,9 +98,7 @@ def delete_category(category_id: int):
             "message": '카테고리가 존재하지 않습니다.'
         }, 404
 
-    # category = db.session.query(Categories).filter_by(category_id=category_id)
     category.enabled = False
-
     db.session.commit()
 
     return jsonify({
