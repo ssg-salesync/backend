@@ -19,12 +19,14 @@ def get_consulting():
     db.session.add(consulting_request_id)
     db.session.commit()
 
-    response = requests.get("http://service-dash.default.svc.cluster.local/orders/paid", json={"table_no": req['table_no'], "store_id": store_id})
+    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales").json()
+
+    if resp.status_code != 200:
+        return jsonify({
+            "result": "failed",
+            "message": "매출 조회 실패"
+        }), 200
 
     return jsonify({
         "req_id": req_id
     }), 200
-
-
-
-
