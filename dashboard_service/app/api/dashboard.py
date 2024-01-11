@@ -68,16 +68,13 @@ def get_sale_per_category():
     else:
         # 기간
         # sale service (sale) 에 해당하는 데이터 가져오기
-        sale_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/period',
-                                 params={'store_id': store_id, 'start': start, 'end': end}).json()  # sale_volume
+        sale_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/period', params={'store_id': store_id, 'start': start, 'end': end}).json()  # sale_volume
 
         # order service (order, cart) 에 해당하는 데이터 가져오기
-        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
-                                  params={'store_id': store_id, 'start': start, 'end': end}).json()  # carts.item_id, carts.quantity
+        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period', params={'store_id': store_id, 'start': start, 'end': end}).json()  # carts.item_id, carts.quantity
 
         # item service (item, category) 에 해당하는 데이터 가져오기
-        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers,
-                                 params={'store_id': store_id}).json()
+        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items', headers=headers, params={'store_id': store_id}).json()
 
         items = get_items_in_orders(order_resp, item_resp)
 
@@ -105,8 +102,6 @@ def get_items_in_orders(order_resp, item_resp):
             else:
                 item_quantities[item_id] = quantity
 
-    print("item_quantities: ", item_quantities)
-
     # item_resp를 dict 형태로 변환
     items_data = {}
     for category in item_resp['categories']:
@@ -117,11 +112,13 @@ def get_items_in_orders(order_resp, item_resp):
     items = []
     for item_id, quantity in item_quantities.items():
         if item_id in items_data:
+            if items_data[item_id]['cost'] is None:
+                items_data[item_id]['cost'] = 0
             items.append({
                 "item_id": item_id,
                 "name": items_data[item_id]['name'],
                 "sales_volume": items_data[item_id]['price'] * quantity,
-                "profit": items_data[item_id]['price'] * quantity - items_data[item_id].get('cost', 0) * quantity,
+                "profit": items_data[item_id]['price'] * quantity - items_data[item_id]['cost'] * quantity,
                 "quantity": quantity
             })
         else:
