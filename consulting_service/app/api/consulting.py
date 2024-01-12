@@ -11,6 +11,11 @@ from ..kafka.producer import send_message
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 
+@bp.route('/hello', methods=['GET'])
+def hello():
+    return jsonify({
+        "message": "hello"
+    }), 200
 
 @bp.route('/', methods=['GET'])
 @jwt_required()
