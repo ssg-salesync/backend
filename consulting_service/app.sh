@@ -6,4 +6,4 @@ flask db init
 flask db migrate
 flask db upgrade
 
-python3 -m flask run --host=0.0.0.0
+gunicorn --bind 0.0.0.0:5000 --timeout 90 "app:create_app()"
