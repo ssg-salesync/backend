@@ -123,10 +123,10 @@ def get_items_in_orders(order_resp, item_resp):
     return items
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('/consulting/<req_id>', methods=['GET'])
 # @jwt_required()
-def get_consulting():
-    req_id = request.args.get('req_id')
+def get_consulting(req_id):
+
     message = consume_message('consulting', req_id)
 
     return jsonify({
