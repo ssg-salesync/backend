@@ -73,4 +73,3 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 return {
                     "error": await response.text()
                 }
-
