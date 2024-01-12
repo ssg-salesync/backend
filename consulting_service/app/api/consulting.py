@@ -38,12 +38,10 @@ async def get_consulting():
     매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}')
 
     result = await send_prompt_to_gpt_async(req_id, prompt)
-    # asyncio.run(send_prompt_to_gpt_async(req_id, prompt))
 
     # kafka 메시지 보내기 (producer)
     message = {'req_id': req_id, 'result': result}
     send_message("consulting", message)
-
 
     return jsonify({
         "req_id": req_id
@@ -74,3 +72,18 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 return {
                     "error": await response.text()
                 }
+
+
+
+@bp.route('/test', methods=['GET'])
+def test():
+    req_id = str(uuid.uuid4())[:20]
+
+    result = '안녕하세요. 굉장히 좌절스럽거든요~ 나는 기부니가 좋크든요~'
+
+    message = {'req_id': req_id, 'result': result}
+    send_message("consulting", message)
+
+    return jsonify({
+        "req_id": req_id
+    }), 200
