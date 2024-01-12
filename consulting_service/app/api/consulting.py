@@ -72,3 +72,18 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 return {
                     "error": await response.text()
                 }
+
+
+
+@bp.route('/test', methods=['GET'])
+def test():
+    req_id = str(uuid.uuid4())[:20]
+
+    result = '안녕하세요. 굉장히 좌절스럽거든요~ 나는 기부니가 좋크든요~'
+
+    message = {'req_id': req_id, 'result': result}
+    send_message("consulting", message)
+
+    return jsonify({
+        "req_id": req_id
+    }), 200

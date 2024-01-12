@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import *
 import requests
+import threading
 from ..kafka.consumer import consume_message
 
 
@@ -122,12 +123,15 @@ def get_items_in_orders(order_resp, item_resp):
     return items
 
 
-@bp.route('/consulting', methods=['GET'])
-@jwt_required()
+@bp.route('/', methods=['GET'])
+# @jwt_required()
 def get_consulting():
+    req_id = request.args.get('req_id')
+    message = consume_message('consulting', req_id)
+
     return jsonify({
         "result": "success",
         "message": "상담 요청 조회 성공",
-        "consulting_requests": consume_message("consulting")
+        "consulting": message
     }), 200
 
