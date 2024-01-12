@@ -44,7 +44,6 @@ async def get_consulting():
     message = {'req_id': req_id, 'result': result}
     send_message("consulting", message)
 
-
     return jsonify({
         "req_id": req_id
     }), 200
@@ -74,3 +73,4 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 return {
                     "error": await response.text()
                 }
+
