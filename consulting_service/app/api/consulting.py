@@ -1,9 +1,8 @@
 import json
 import aiohttp
-import asyncio
 import os
-from flask import Blueprint, request, jsonify
-from ..models import db, ConsultingRequestIds
+from flask import Blueprint, jsonify
+from ..models import db, ConsultingResults
 from flask_jwt_extended import *
 import requests
 import uuid
@@ -19,9 +18,9 @@ async def get_consulting():
     store_id = get_jwt_identity()
     req_id = str(uuid.uuid4())[:20]
 
-    consulting_request_id = ConsultingRequestIds(store_id=store_id, req_id=req_id)
-
-    db.session.add(consulting_request_id)
+    # req_id를 db 저장
+    consulting_result = ConsultingResults(req_id=req_id)
+    db.session.add(consulting_result)
     db.session.commit()
 
     resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales").json()
@@ -37,11 +36,7 @@ async def get_consulting():
     이 데이터를 바탕으로 이익이 적게 나는 메뉴와 이익이 많이 나는 메뉴를 분석해주세요. 또한, 이 데이터를 통해 어떤 메뉴에 대한 프로모션 전략이 \
     매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}')
 
-    result = await send_prompt_to_gpt_async(req_id, prompt)
-
-    # kafka 메시지 보내기 (producer)
-    message = {'req_id': req_id, 'result': result}
-    send_message("consulting", message)
+    await send_prompt_to_gpt_async(req_id, prompt)
 
     return jsonify({
         "req_id": req_id
@@ -65,25 +60,39 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, json=data) as response:
             if response.status == 200:
-                return {
-                    "response": await response.json()
-                }
+                # db에 결과 넣기
+                # consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+                # consulting_result.is_completed = True
+                # db.session.commit()
+
+                # kafka 메시지 보내기 (producer)
+                message = {'req_id': req_id, 'result': response.json()}
+                send_message("consulting", message)
             else:
                 return {
                     "error": await response.text()
                 }
 
 
+@bp.route('/<req_id>', methods=['GET'])
+def get_check_consulting(req_id):
 
-@bp.route('/test', methods=['GET'])
-def test():
-    req_id = str(uuid.uuid4())[:20]
+    consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+    if consulting_result is None:
+        return jsonify({
+            "result": "failed",
+            "message": "컨설팅 요청 없음"
+        }), 200
+    elif consulting_result.is_completed is False:
+        return jsonify({
+            "result": "not completed",
+            "message": "컨설팅 진행 중"
+        }), 200
+    else:
+        return jsonify({
+            "result": "success",
+            "message": "컨설팅 완료",
+            "req_id": req_id
+        }), 200
 
-    result = '안녕하세요. 굉장히 좌절스럽거든요~ 나는 기부니가 좋크든요~'
 
-    message = {'req_id': req_id, 'result': result}
-    send_message("consulting", message)
-
-    return jsonify({
-        "req_id": req_id
-    }), 200
