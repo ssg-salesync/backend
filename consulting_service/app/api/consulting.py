@@ -1,7 +1,7 @@
 import json
 import aiohttp
 import os
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from ..models import db, ConsultingResults
 from flask_jwt_extended import *
 import requests
@@ -23,12 +23,17 @@ async def get_consulting():
     store_id = get_jwt_identity()
     req_id = str(uuid.uuid4())[:20]
 
+    headers = {
+        'Authorization': request.headers['Authorization'],
+        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN']
+    }
+
     # req_id를 db 저장
     consulting_result = ConsultingResults(req_id=req_id)
     db.session.add(consulting_result)
     db.session.commit()
 
-    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales").json()
+    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers).json()
 
     if resp.status_code != 200:
         return jsonify({
