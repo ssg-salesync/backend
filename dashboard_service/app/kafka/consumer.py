@@ -4,7 +4,7 @@ import json
 
 def create_consumer():
     consumer = Consumer({
-        'bootstrap.servers': 'localhost:9092',
+        'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092',
         # 'security.protocol': 'SASL_PLAINTEXT',
         # 'sasl.mechanåism': 'SCRAM-SHA-256',
         # 'sasl.username': 'admin',

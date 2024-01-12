@@ -4,7 +4,7 @@ import json
 
 def create_producer():
     producer = Producer({
-        'bootstrap.servers': 'localhost:9092'
+        'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092'
         # 'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092',
         # 'security.protocol': 'SASL_PLAINTEXT',
         # 'sasl.mechanism': 'SCRAM-SHA-256',
