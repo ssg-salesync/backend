@@ -6,7 +6,7 @@ def create_consumer():
     consumer = Consumer({
         'bootstrap.servers': 'kafka.kafka.svc.cluster.local:9092',
         'security.protocol': 'PLAINTEXT',
-        'sasl.mechanism': 'SCRAM-SHA-256',
+        # 'sasl.mechanism': 'SCRAM-SHA-256',
         'group.id': 'salesync',
         'auto.offset.reset': 'earliest'
     })
