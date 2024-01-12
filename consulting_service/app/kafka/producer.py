@@ -4,8 +4,8 @@ import json
 
 def create_producer():
     producer = Producer({
-        'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092',
-        'security.protocol': 'SASL_PLAINTEXT',
+        'bootstrap.servers': 'kafka.kafka.svc.cluster.local:9092',
+        'security.protocol': 'PLAINTEXT',
         'sasl.mechanism': 'SCRAM-SHA-256',
         # 'sasl.username': 'user1',
         # 'sasl.password': 'aAlsxk8ihq'
