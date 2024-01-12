@@ -5,9 +5,9 @@ def create_producer():
     producer = Producer({
         'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092',
         'security.protocol': 'SASL_PLAINTEXT',
-        'sasl.mechanism': 'SCRAM-SHA-256',
-        'sasl.username': 'admin',
-        'sasl.password': 'password'
+        'sasl.mechanism': 'PLAIN',
+        'sasl.username': 'user_user1',
+        'sasl.password': 'aAlsxk8ihq'
     })
 
     return producer
