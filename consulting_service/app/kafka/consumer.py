@@ -7,8 +7,8 @@ def create_consumer():
         'bootstrap.servers': 'my-kafka.kafka.svc.cluster.local:9092',
         'security.protocol': 'SASL_PLAINTEXT',
         'sasl.mechanism': 'PLAIN',
-        'sasl.username': 'inter_broker_user',
-        'sasl.password': 'aqsA1SGNhS',
+        # 'sasl.username': 'inter_broker_user',
+        # 'sasl.password': 'aqsA1SGNhS',
         'group.id': 'salesync',
         'auto.offset.reset': 'earliest'
     })
