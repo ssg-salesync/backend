@@ -42,7 +42,8 @@ async def get_consulting():
 
     headers = {
         'Authorization': request.headers['Authorization'],
-        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN']
+        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN'],
+        'Content-Type': 'application/json'
     }
 
     # req_id를 db 저장
