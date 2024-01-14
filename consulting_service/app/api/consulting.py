@@ -12,26 +12,26 @@ from ..kafka.producer import send_message
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 
 
-@bp.route('/<req_id>', methods=['GET'])
-def get_check_consulting(req_id):
-
-    consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
-    if consulting_result is None:
-        return jsonify({
-            "result": "failed",
-            "message": "컨설팅 요청 없음"
-        }), 200
-    elif consulting_result.is_completed is False:
-        return jsonify({
-            "result": "not completed",
-            "message": "컨설팅 진행 중"
-        }), 200
-    else:
-        return jsonify({
-            "result": "success",
-            "message": "컨설팅 완료",
-            "req_id": req_id
-        }), 200
+# @bp.route('/<req_id>', methods=['GET'])
+# def get_check_consulting(req_id):
+#
+#     consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+#     if consulting_result is None:
+#         return jsonify({
+#             "result": "failed",
+#             "message": "컨설팅 요청 없음"
+#         }), 200
+#     elif consulting_result.is_completed is False:
+#         return jsonify({
+#             "result": "not completed",
+#             "message": "컨설팅 진행 중"
+#         }), 200
+#     else:
+#         return jsonify({
+#             "result": "success",
+#             "message": "컨설팅 완료",
+#             "req_id": req_id
+#         }), 200
 
 
 @bp.route('/', methods=['GET'])
