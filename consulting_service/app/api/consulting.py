@@ -12,28 +12,6 @@ from ..kafka.producer import send_message
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 
 
-# @bp.route('/<req_id>', methods=['GET'])
-# def get_check_consulting(req_id):
-#
-#     consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
-#     if consulting_result is None:
-#         return jsonify({
-#             "result": "failed",
-#             "message": "컨설팅 요청 없음"
-#         }), 200
-#     elif consulting_result.is_completed is False:
-#         return jsonify({
-#             "result": "not completed",
-#             "message": "컨설팅 진행 중"
-#         }), 200
-#     else:
-#         return jsonify({
-#             "result": "success",
-#             "message": "컨설팅 완료",
-#             "req_id": req_id
-#         }), 200
-
-
 @bp.route('/getgpt', methods=['GET'])
 @jwt_required()
 async def get_consulting():
@@ -42,8 +20,7 @@ async def get_consulting():
 
     headers = {
         'Authorization': request.headers['Authorization'],
-        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN'],
-        'Content-Type': 'application/json'
+        'X-CSRF-Token': request.headers['X-CSRF-Token']
     }
 
     # req_id를 db 저장
@@ -69,6 +46,28 @@ async def get_consulting():
     return jsonify({
         "req_id": req_id
     }), 200
+
+
+@bp.route('/<req_id>', methods=['GET'])
+def get_check_consulting(req_id):
+
+    consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+    if consulting_result is None:
+        return jsonify({
+            "result": "failed",
+            "message": "컨설팅 요청 없음"
+        }), 200
+    elif consulting_result.is_completed is False:
+        return jsonify({
+            "result": "not completed",
+            "message": "컨설팅 진행 중"
+        }), 200
+    else:
+        return jsonify({
+            "result": "success",
+            "message": "컨설팅 완료",
+            "req_id": req_id
+        }), 200
 
 
 async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
@@ -100,8 +99,3 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 return {
                     "error": await response.text()
                 }
-
-
-
-
-
