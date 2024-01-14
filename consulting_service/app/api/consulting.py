@@ -12,7 +12,7 @@ from ..kafka.producer import send_message
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 
 
-@bp.route('/getgpt', methods=['GET'])
+@bp.route('/', methods=['GET'])
 @jwt_required()
 async def get_consulting():
     # store_id = get_jwt_identity()
@@ -93,9 +93,9 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
         async with session.post(url, headers=headers, json=data) as response:
             if response.status == 200:
                 # db에 결과 넣기
-                # consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
-                # consulting_result.is_completed = True
-                # db.session.commit()
+                consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+                consulting_result.is_completed = True
+                db.session.commit()
 
                 # kafka 메시지 보내기 (producer)
                 message = {'req_id': req_id, 'result': response.json()}
