@@ -30,6 +30,9 @@ def consume_message(topic, req_id):
                 msg_value = msg.value().decode('utf-8')
                 msg_dict = json.loads(msg_value)
                 if msg_dict['req_id'] == req_id:
-                    return msg.value().decode('utf-8')
+                    return msg.value
+    except json.JSONDecodeError as e:
+        print(f"JSONDecodeError: {e}")
+        return None
     finally:
         consumer.close()
