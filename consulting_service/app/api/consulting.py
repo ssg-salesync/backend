@@ -15,7 +15,7 @@ bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 @bp.route('/getgpt', methods=['GET'])
 @jwt_required()
 async def get_consulting():
-    store_id = get_jwt_identity()
+    # store_id = get_jwt_identity()
     req_id = str(uuid.uuid4())[:20]
 
     headers = {
