@@ -33,7 +33,7 @@ async def get_consulting():
     db.session.add(consulting_result)
     db.session.commit()
 
-    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params).json()
+    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params)
 
     if resp.status_code != 200:
         return jsonify({
