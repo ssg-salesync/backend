@@ -23,12 +23,17 @@ async def get_consulting():
         'X-CSRF-Token': request.headers['X-CSRF-Token']
     }
 
+    params = {
+        'start': request.args.get('start'),
+        'end': request.args.get('end')
+    }
+
     # req_id를 db 저장
     consulting_result = ConsultingResults(req_id=req_id)
     db.session.add(consulting_result)
     db.session.commit()
 
-    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers).json()
+    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params).json()
 
     if resp.status_code != 200:
         return jsonify({
