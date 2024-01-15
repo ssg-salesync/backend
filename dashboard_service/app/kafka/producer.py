@@ -3,7 +3,8 @@ import json
 
 def create_producer():
     producer = Producer({
-        'bootstrap.servers': 'salesync-kafka.kafka.svc.cluster.local:9092',
+        # 'bootstrap.servers': 'salesync-kafka.kafka.svc.cluster.local:9092',
+        'bootstrap.servers': 'localhost:9092',
         'security.protocol': 'PLAINTEXT'
     })
 
