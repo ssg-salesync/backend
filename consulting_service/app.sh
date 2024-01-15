@@ -10,7 +10,7 @@ migrate() {
 }
 
 run_app() {
-    python3 -m flask run --host=0.0.0.0
+    gunicorn --bind 0.0.0.0:5000 --timeout 300 "app:create_app()"
 }
 
 main() {
