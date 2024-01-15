@@ -8,12 +8,12 @@ import asyncio
 import requests
 import uuid
 import json
-import logging
+import os
 import threading
 
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
-client = OpenAI(api_key="")
+client = OpenAI(api_key=os.environ['OPEN_AI_API_KEY'])
 
 
 @bp.route('/', methods=['GET'])
