@@ -14,6 +14,20 @@ import asyncio
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
 
 
+@bp.route('/test', methods=['GET'])
+def consulting():
+    req_id = str(uuid.uuid4())[:20]
+
+    result = '안녕하세요. 나는 현재 카프카를 테스트하고 있습니다. 문제가 발생하면 나는 볼 수 없어요. 왜냐구요? 굉장히 좌절스럽거든요~'
+
+    message = {'req_id': req_id, 'result': result}
+    send_message("consulting", message)
+
+    return jsonify({
+        "req_id": req_id
+    }), 200
+
+
 @bp.route('/', methods=['GET'])
 @jwt_required()
 async def get_consulting():
@@ -35,7 +49,8 @@ async def get_consulting():
     db.session.add(consulting_result)
     db.session.commit()
 
-    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params)
+    # resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params)
+    resp = requests.get("https://api.salesync.site/dashboard/sales", headers=headers, params=params)
 
     if resp.status_code != 200:
         return jsonify({
