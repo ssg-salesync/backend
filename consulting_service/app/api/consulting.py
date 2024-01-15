@@ -7,6 +7,8 @@ from flask_jwt_extended import *
 import requests
 import uuid
 from ..kafka.producer import send_message
+import openai
+import asyncio
 
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
@@ -76,35 +78,30 @@ def get_check_consulting(req_id):
 
 
 async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
-    print("1. send_prompt_to_gpt_async")
-    req_id = req_id
-    url = f"https://api.openai.com/v1/engines/{engine}/completions"
+    openai.api_key = os.getenv('OPEN_AI_API_KEY')
 
-    headers = {
-        "Authorization": f"Bearer {os.getenv('OPEN_AI_API_KEY')}",
-        "Content-Type": "application/json"
-    }
+    try:
+        response = await asyncio.to_thread(
+            openai.Completion.create,
+            engine=engine,
+            prompt=prompt,
+            max_tokens=150
+        )
 
-    data = {
-        "prompt": prompt,
-        "max_tokens": 500
-    }
+        # 응답 처리
+        text = response.choices[0].text.strip()
 
-    async with aiohttp.ClientSession() as session:
-        print("2. send_prompt_to_gpt_async")
-        async with session.post(url, headers=headers, json=data) as response:
-            if response.status == 200:
-                print("3.1. send_prompt_to_gpt_async")
-                # db에 결과 넣기
-                consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
-                consulting_result.is_completed = True
-                db.session.commit()
+        save_response_to_db(req_id, text)
 
-                # kafka 메시지 보내기 (producer)
-                message = {'req_id': req_id, 'result': response.json()}
-                send_message("consulting", message)
-            else:
-                print("3.2. send_prompt_to_gpt_async")
-                return {
-                    "error": await response.text()
-                }
+    except Exception as e:
+        print(f"Error while sending prompt to GPT: {e}")
+
+
+def save_response_to_db(req_id, response_text):
+    consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+    consulting_result.response = response_text
+    consulting_result.is_completed = True
+    db.session.commit()
+
+    message = {';req_id': req_id, 'response': response_text}
+    send_message('consulting', message)
