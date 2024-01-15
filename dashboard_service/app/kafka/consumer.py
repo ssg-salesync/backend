@@ -26,7 +26,7 @@ def consume_message(topic, req_id):
             if msg.error():
                 raise KafkaException(msg.error())
             else:
-                print(f"Received message: {msg.value().decode('utf-8')}")
+                # print(f"Received message: {msg.value().decode('utf-8')}")
                 msg_value = msg.value().decode('utf-8')
                 msg_dict = json.loads(msg_value)
                 if msg_dict['req_id'] == req_id:
