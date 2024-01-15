@@ -4,7 +4,8 @@ import json
 
 def create_consumer():
     consumer = Consumer({
-        'bootstrap.servers': 'salesync-kafka.kafka.svc.cluster.local:9092',
+        # 'bootstrap.servers': 'salesync-kafka.kafka.svc.cluster.local:9092',
+        'bootstrap.servers': 'localhost:9092',
         'security.protocol': 'PLAINTEXT',
         # 'sasl.mechanism': 'SCRAM-SHA-256',
         'group.id': 'salesync',

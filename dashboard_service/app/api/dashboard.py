@@ -135,3 +135,13 @@ def get_consulting(req_id):
         "consulting": message
     }), 200
 
+
+@bp.route('/test/<req_id>', methods=['GET'])
+def test(req_id):
+    message = consume_message('consulting', req_id)
+
+    return jsonify({
+        "result": "success",
+        "message": "상담 요청 조회 성공",
+        "consulting": message
+    }), 200
