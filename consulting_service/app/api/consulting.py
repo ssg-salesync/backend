@@ -1,17 +1,15 @@
-import json
-import logging
-import threading
-
-import aiohttp
-import os
 from flask import Blueprint, jsonify, request, current_app
 from ..models import db, ConsultingResults
 from flask_jwt_extended import *
-import requests
-import uuid
 from ..kafka.producer import send_message
 from openai import OpenAI
+
 import asyncio
+import requests
+import uuid
+import json
+import logging
+import threading
 
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
@@ -35,7 +33,6 @@ def consulting():
 @bp.route('/', methods=['GET'])
 @jwt_required()
 async def get_consulting():
-    # store_id = get_jwt_identity()
     req_id = str(uuid.uuid4())[:20]
 
     headers = {
@@ -48,7 +45,6 @@ async def get_consulting():
         'end': request.args.get('end')
     }
 
-    # req_id를 db 저장
     consulting_result = ConsultingResults(req_id=req_id)
     db.session.add(consulting_result)
     db.session.commit()
@@ -62,17 +58,11 @@ async def get_consulting():
             "message": "매출 조회 실패"
         }), 200
 
-    # messages = []
     sales_json = json.dumps(resp.json())
     prompt = f'안녕하세요, 저는 소매점 운영자입니다. 저희 매장의 각 메뉴별 매출액, 순이익, 판매량을 포함한 JSON 데이터를 제공하고자 합니다. \
     이 데이터를 바탕으로 이익이 적게 나는 메뉴와 이익이 많이 나는 메뉴를 분석해주세요. 또한, 이 데이터를 통해 어떤 메뉴에 대한 프로모션 전략이 \
     매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}'
-    # messages.append({
-    #     'role': 'user',
-    #     'content': prompt
-    # })
 
-    # asyncio.create_task(send_prompt_to_gpt_async(req_id, prompt))
     app = current_app._get_current_object()
     threading.Thread(target=run_async_task, args=(app, req_id, prompt)).start()
 
@@ -83,8 +73,8 @@ async def get_consulting():
 
 @bp.route('/<req_id>', methods=['GET'])
 def get_check_consulting(req_id):
-
     consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
+
     if consulting_result is None:
         return jsonify({
             "result": "failed",
@@ -109,7 +99,6 @@ def run_async_task(app, req_id, prompt):
 
 
 async def async_chat_completion(engine, prompt):
-    logging.info(f"Sending prompt to GPT2")
     return client.chat.completions.create(
         model=engine,
         messages=[{
@@ -121,13 +110,11 @@ async def async_chat_completion(engine, prompt):
 
 
 async def send_prompt_to_gpt_async(req_id, prompt, engine='gpt-3.5-turbo'):
-    logging.info(f"Sending prompt to GPT1")
     try:
         response = await asyncio.to_thread(
             lambda: asyncio.run(async_chat_completion(engine, prompt))
         )
 
-        # 응답 처리
         save_response_to_db(req_id, response.choices[0].message.content)
 
     except Exception as e:
@@ -139,8 +126,6 @@ def save_response_to_db(req_id, response_text):
     consulting_result.result = response_text
     consulting_result.is_completed = True
     db.session.commit()
-
-    logging.info(f"Response saved to db: {response_text}")
 
     message = {'req_id': req_id, 'response': response_text}
     send_message('consulting', message)
