@@ -76,6 +76,7 @@ def get_check_consulting(req_id):
 
 
 async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
+    print("1. send_prompt_to_gpt_async")
     req_id = req_id
     url = f"https://api.openai.com/v1/engines/{engine}/completions"
 
@@ -90,8 +91,10 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
     }
 
     async with aiohttp.ClientSession() as session:
+        print("2. send_prompt_to_gpt_async")
         async with session.post(url, headers=headers, json=data) as response:
             if response.status == 200:
+                print("3.1. send_prompt_to_gpt_async")
                 # db에 결과 넣기
                 consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
                 consulting_result.is_completed = True
@@ -101,6 +104,7 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
                 message = {'req_id': req_id, 'result': response.json()}
                 send_message("consulting", message)
             else:
+                print("3.2. send_prompt_to_gpt_async")
                 return {
                     "error": await response.text()
                 }
