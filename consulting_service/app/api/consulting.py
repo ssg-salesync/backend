@@ -1,17 +1,21 @@
 import json
+import logging
+import threading
+
 import aiohttp
 import os
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from ..models import db, ConsultingResults
 from flask_jwt_extended import *
 import requests
 import uuid
 from ..kafka.producer import send_message
-import openai
+from openai import OpenAI
 import asyncio
 
 
 bp = Blueprint('consulting', __name__, url_prefix='/consulting')
+client = OpenAI(api_key="")
 
 
 @bp.route('/test', methods=['GET'])
@@ -58,12 +62,19 @@ async def get_consulting():
             "message": "매출 조회 실패"
         }), 200
 
+    # messages = []
     sales_json = json.dumps(resp.json())
-    prompt = (f'안녕하세요, 저는 소매점 운영자입니다. 저희 매장의 각 메뉴별 매출액, 순이익, 판매량을 포함한 JSON 데이터를 제공하고자 합니다. \
+    prompt = f'안녕하세요, 저는 소매점 운영자입니다. 저희 매장의 각 메뉴별 매출액, 순이익, 판매량을 포함한 JSON 데이터를 제공하고자 합니다. \
     이 데이터를 바탕으로 이익이 적게 나는 메뉴와 이익이 많이 나는 메뉴를 분석해주세요. 또한, 이 데이터를 통해 어떤 메뉴에 대한 프로모션 전략이 \
-    매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}')
+    매출 증대에 도움이 될지 구체적인 제안을 부탁드립니다. 추가적인 시장 분석이나 경쟁자 정보도 필요하다면 알려주세요. / {sales_json}'
+    # messages.append({
+    #     'role': 'user',
+    #     'content': prompt
+    # })
 
-    await send_prompt_to_gpt_async(req_id, prompt)
+    # asyncio.create_task(send_prompt_to_gpt_async(req_id, prompt))
+    app = current_app._get_current_object()
+    threading.Thread(target=run_async_task, args=(app, req_id, prompt)).start()
 
     return jsonify({
         "req_id": req_id
@@ -92,21 +103,32 @@ def get_check_consulting(req_id):
         }), 200
 
 
-async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
-    openai.api_key = os.getenv('OPEN_AI_API_KEY')
+def run_async_task(app, req_id, prompt):
+    with app.app_context():
+        asyncio.run(send_prompt_to_gpt_async(req_id, prompt))
 
+
+async def async_chat_completion(engine, prompt):
+    logging.info(f"Sending prompt to GPT2")
+    return client.chat.completions.create(
+        model=engine,
+        messages=[{
+            "role": "user",
+            "content": prompt
+            }
+        ]
+    )
+
+
+async def send_prompt_to_gpt_async(req_id, prompt, engine='gpt-3.5-turbo'):
+    logging.info(f"Sending prompt to GPT1")
     try:
         response = await asyncio.to_thread(
-            openai.Completion.create,
-            engine=engine,
-            prompt=prompt,
-            max_tokens=150
+            lambda: asyncio.run(async_chat_completion(engine, prompt))
         )
 
         # 응답 처리
-        text = response.choices[0].text.strip()
-
-        save_response_to_db(req_id, text)
+        save_response_to_db(req_id, response.choices[0].message.content)
 
     except Exception as e:
         print(f"Error while sending prompt to GPT: {e}")
@@ -114,9 +136,11 @@ async def send_prompt_to_gpt_async(req_id, prompt, engine='davinci'):
 
 def save_response_to_db(req_id, response_text):
     consulting_result = ConsultingResults.query.filter_by(req_id=req_id).first()
-    consulting_result.response = response_text
+    consulting_result.result = response_text
     consulting_result.is_completed = True
     db.session.commit()
 
-    message = {';req_id': req_id, 'response': response_text}
+    logging.info(f"Response saved to db: {response_text}")
+
+    message = {'req_id': req_id, 'response': response_text}
     send_message('consulting', message)
