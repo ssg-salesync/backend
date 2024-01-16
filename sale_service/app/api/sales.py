@@ -91,7 +91,6 @@ def get_daily_sales():
     sales = Sales.query.filter_by(store_id=store_id).filter(
         db.func.date(Sales.sale_date) == date
     ).all()
-    print(sales)
 
     sales_volume = 0
 
