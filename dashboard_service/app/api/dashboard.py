@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import requests
 import threading
 
-
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 
@@ -150,7 +149,7 @@ def get_total_volumes():
             sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily',
                                       params={'store_id': store_id, 'date': date_str}).json()
             order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
-                                  params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
+                                      params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
             item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
                                      headers=headers, params={'store_id': store_id}).json()
 
