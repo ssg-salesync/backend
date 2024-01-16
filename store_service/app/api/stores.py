@@ -18,11 +18,11 @@ def first_login(username, password):
 
     access_token = create_access_token(identity=store.store_id, )
 
-    return jsonify({
+    return {
         "store_id": store.store_id,
         "access_token": access_token,
         "csrf_token": generate_csrf()
-    }), 200
+    }
 
 
 @bp.route('/all', methods=['GET'])
