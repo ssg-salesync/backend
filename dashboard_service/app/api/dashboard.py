@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, logging
 from flask_jwt_extended import *
 from ..kafka.consumer import consume_message
 from datetime import datetime, timedelta
@@ -143,8 +143,10 @@ def get_total_volumes():
 
         for i in range(int((end - start).days) + 1):
             date = start + timedelta(days=i)
+            date_str = date.strftime('%Y-%m-%d')
+
             sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily',
-                                      params={'store_id': store_id, 'date': date}).json()
+                                      params={'store_id': store_id, 'date': date_str}).json()
             order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/daily',
                                       params={'store_id': store_id, 'date': start}).json()
             item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
@@ -158,11 +160,11 @@ def get_total_volumes():
 
             sales_volume = sales_resp['sales_volume']
 
-            total.append(jsonify({
-                "date": date,
+            total.append({
+                "date": date.strftime('%Y-%m-%d'),
                 "profit": profit,
                 "sales_volume": sales_volume
-            }))
+            })
 
         return jsonify({
             "total": total,
