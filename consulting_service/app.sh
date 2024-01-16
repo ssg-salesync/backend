@@ -10,7 +10,8 @@ migrate() {
 }
 
 run_app() {
-    gunicorn --bind 0.0.0.0:5000 --timeout 300 "app:create_app()"
+    gunicorn --bind 0.0.0.0:5000 --timeout 300 "app:create_app()" --log-level info --access-logfile - --error-logfile -
+
 }
 
 main() {
