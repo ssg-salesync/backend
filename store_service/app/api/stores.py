@@ -76,7 +76,6 @@ def get_store():
 
 
 def first_login(username, password):
-
     store = Stores.query.filter_by(username=username).first()
 
     if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
