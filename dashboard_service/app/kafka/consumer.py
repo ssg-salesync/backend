@@ -30,6 +30,8 @@ def consume_message(topic, req_id):
                 msg_value = msg.value().decode('utf-8')
                 msg_dict = json.loads(msg_value)
                 if msg_dict['req_id'] == req_id:
-                    return msg.value().decode('utf-8')
+                    response = msg_dict.get('response', '')
+                    resp_msg = response.replace('\\', '')
+                    return resp_msg
     finally:
         consumer.close()
