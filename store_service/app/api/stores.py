@@ -75,6 +75,22 @@ def get_store():
     }), 200
 
 
+def first_login(username, password):
+
+    store = Stores.query.filter_by(username=username).first()
+
+    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
+        return jsonify({'error': 'Invalid username or password'}), 400
+
+    access_token = create_access_token(identity=store.store_id, )
+
+    return jsonify({
+        "store_id": store.store_id,
+        "access_token": access_token,
+        "csrf_token": generate_csrf()
+    }), 200
+
+
 @bp.route('/<int:store_id>', methods=['PUT'])
 def update_store(store_id):
     store = Stores.query.get(store_id)
@@ -161,18 +177,3 @@ def check_password():
         }), 200
 
 
-def first_login(username, password):
-
-    store = Stores.query.filter_by(username=username).first()
-
-    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
-        return jsonify({'error': 'Invalid username or password'}), 400
-
-    access_token = create_access_token(identity=store.store_id, )
-
-    return jsonify({
-        'result': "success",
-        "store_id": store.store_id,
-        "access_token": access_token,
-        "csrf_token": generate_csrf()
-    }), 200
