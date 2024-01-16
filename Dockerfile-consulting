@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:latest
 
 WORKDIR /salesync
 
@@ -7,7 +7,7 @@ COPY consulting_service /salesync/consulting_service
 RUN apt-get update -y
 RUN apt-get install -y libpq-dev
 RUN apt-get install -y python3-dev
-RUN apt-get install -y python3.9
+RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 
 RUN pip install wheel
