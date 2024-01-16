@@ -306,3 +306,4 @@ def get_items_in_cart(carts):
         total_price += (item['price'] * quantity)
 
     return items_in_cart, total_price
+

@@ -42,18 +42,40 @@ def create_store():
     address = data['address']
     store_type = data['store_type']
 
-    store = Stores(username=username, password=password, owner_name=owner_name, phone=phone, store_name=store_name,
+    print(username, password, owner_name, phone, store_name, address, store_type)
+
+    new_store = Stores(username=username, password=password, owner_name=owner_name, phone=phone, store_name=store_name,
                    address=address, store_type=store_type)
-    db.session.add(store)
+    db.session.add(new_store)
     db.session.commit()
 
-    resp = first_login(username, password)
+    resp = first_login(username, data['password'])
+    print(resp)
 
     return jsonify({
         "result": "success",
         "message": "매장 등록 성공",
-        "resp": resp
+        "store_id": resp['store_id'],
+        "token": {
+            "access_token": resp['access_token'],
+            "csrf_token": resp['csrf_token']
+        }
     }), 201
+
+
+def first_login(username, password):
+    store = Stores.query.filter_by(username=username).first()
+
+    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
+        return jsonify({'error': 'Invalid username or password'}), 400
+
+    access_token = create_access_token(identity=store.store_id, )
+
+    return {
+        "store_id": store.store_id,
+        "access_token": access_token,
+        "csrf_token": generate_csrf()
+    }
 
 
 @bp.route('/', methods=['GET'])
@@ -75,6 +97,7 @@ def get_store():
     }), 200
 
 
+<<<<<<< HEAD
 def first_login(username, password):
     store = Stores.query.filter_by(username=username).first()
 
@@ -90,6 +113,8 @@ def first_login(username, password):
     }), 200
 
 
+=======
+>>>>>>> refs/remotes/origin/main
 @bp.route('/<int:store_id>', methods=['PUT'])
 def update_store(store_id):
     store = Stores.query.get(store_id)
@@ -174,5 +199,3 @@ def check_password():
             "result": "success",
             "message": "비밀번호가 일치합니다."
         }), 200
-
-

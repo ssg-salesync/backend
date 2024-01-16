@@ -129,3 +129,4 @@ def get_period_sales():
         "start_date": start,
         "end_date": end
     }), 200
+
