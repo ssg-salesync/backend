@@ -65,7 +65,6 @@ def create_store():
     db.session.commit()
 
     resp = first_login(username, data['password'])
-    print(resp)
 
     return jsonify({
         "result": "success",
@@ -76,21 +75,6 @@ def create_store():
             "csrf_token": resp['csrf_token']
         }
     }), 201
-
-
-def first_login(username, password):
-    store = Stores.query.filter_by(username=username).first()
-
-    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
-        return jsonify({'error': 'Invalid username or password'}), 400
-
-    access_token = create_access_token(identity=store.store_id, )
-
-    return {
-        "store_id": store.store_id,
-        "access_token": access_token,
-        "csrf_token": generate_csrf()
-    }
 
 
 @bp.route('/', methods=['GET'])
