@@ -47,18 +47,12 @@ def create_store():
     db.session.add(store)
     db.session.commit()
 
+    resp = first_login(username, password)
+
     return jsonify({
-        "store": {
-            "store_id": store.store_id,
-            "username": store.username,
-            "owner_name": store.owner_name,
-            "phone": store.phone,
-            "store_name": store.store_name,
-            "address": store.address,
-            "store_type": store.store_type
-        },
         "result": "success",
-        "message": "매장 등록 성공"
+        "message": "매장 등록 성공",
+        "resp": resp
     }), 201
 
 
@@ -78,6 +72,22 @@ def get_store():
             "address": store.address,
             "store_type": store.store_type
         }
+    }), 200
+
+
+def first_login(username, password):
+
+    store = Stores.query.filter_by(username=username).first()
+
+    if not store or not bcrypt.check_password_hash(pw_hash=store.password, password=password):
+        return jsonify({'error': 'Invalid username or password'}), 400
+
+    access_token = create_access_token(identity=store.store_id, )
+
+    return jsonify({
+        "store_id": store.store_id,
+        "access_token": access_token,
+        "csrf_token": generate_csrf()
     }), 200
 
 
@@ -165,3 +175,5 @@ def check_password():
             "result": "success",
             "message": "비밀번호가 일치합니다."
         }), 200
+
+
