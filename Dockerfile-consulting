@@ -24,7 +24,7 @@ ENV DB_NAME=salesync
 ENV SECRET_KEY=b'\xa2\xa4A\x84\x9f\x86\x82\x05G\xe2\xb2eD\x18p\x01'
 ENV JWT_SECRET_KEY=b'\xb4\xc4\x8b\xfbU\xc1\x8d\x1d\x82\xca\x08^\x0bO\x05I'
 #ARG OPEN_AI_API_KEY
-#ENV OPEN_AI_API_KEY=API_KEY
+ENV OPEN_AI_API_KEY=API_KEY
 
 
 RUN chmod +x /salesync/consulting_service/app.sh

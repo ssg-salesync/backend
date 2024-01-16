@@ -116,4 +116,3 @@ def save_response_to_db(req_id, response_text):
     message = {'req_id': req_id, 'response': response_text}
     send_message('consulting', message)
 
-
