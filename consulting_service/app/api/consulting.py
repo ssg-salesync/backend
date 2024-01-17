@@ -131,8 +131,9 @@ def test():
         'start': request.args.get('start'),
         'end': request.args.get('end')
     }
+    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params)
 
-    resp = requests.get("http://api.salesync.site/dashboard/sales", headers=headers, params=params)
+    # resp = requests.get("http://api.salesync.site/dashboard/sales", headers=headers, params=params)
 
     if resp.status_code != 200:
         return jsonify({
