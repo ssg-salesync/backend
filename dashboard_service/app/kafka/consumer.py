@@ -1,4 +1,4 @@
-from confluent_kafka import Consumer, KafkaException
+from confluent_kafka import Consumer, KafkaException, TopicPartition
 import json
 
 
@@ -14,14 +14,19 @@ def create_consumer():
     return consumer
 
 
-def consume_message(topic, req_id):
+def consume_message(topic, req_id, partition=0, offset=0):
     consumer = create_consumer()
-    consumer.subscribe([topic])
+    # consumer.subscribe([topic])
+
+    tp = TopicPartition(topic, partition, offset)
 
     try:
+        consumer.assign([tp])
+        consumer.seek(tp)
+
         while True:
-            # msg = consumer.poll(timeout=1.0)
-            msg = consumer.seek(topic)
+            msg = consumer.poll(timeout=1.0)
+
             if msg is None:
                 continue
             if msg.error():
