@@ -142,10 +142,10 @@ def test():
         }), 200
 
     # consulting = ConsultingResults(req_id="45b2086b-3a77-4c09-8")
-    consulting = ConsultingResults.query.filter_by(req_id="45b2086b-3a77-4c09-8").first()
-    result = {'req_id': consulting.req_id, 'response': consulting.result}
+    # consulting = ConsultingResults.query.filter_by(req_id="45b2086b-3a77-4c09-8").first()
+    # result = {'req_id': consulting.req_id, 'response': consulting.result}
     # print(result)
-    send_message("test", result)
+    # send_message("test", result)
 
     return jsonify({
         "req_id": "45b2086b-3a77-4c09-8"
