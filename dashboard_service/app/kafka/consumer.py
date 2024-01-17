@@ -7,7 +7,7 @@ def create_consumer():
         'bootstrap.servers': 'salesync-kafka-controller-0.salesync-kafka-controller-headless.kafka.svc.cluster.local:9092,salesync-kafka-controller-1.salesync-kafka-controller-headless.kafka.svc.cluster.local:9092,salesync-kafka-controller-2.salesync-kafka-controller-headless.kafka.svc.cluster.local:9092',
         # 'bootstrap.servers': 'localhost:9092',
         # 'security.protocol': 'PLAINTEXT',
-        # 'group.id': 'salesync',
+        'group.id': 'salesync',
         'auto.offset.reset': 'earliest'
     })
 
@@ -37,6 +37,5 @@ def consume_message(topic, req_id, partition=0, offset=0):
                         return resp_msg
                 except json.JSONDecodeError:
                     print(f"Invalid JSON format: {msg.value().decode('utf-8')}")
-
     finally:
         consumer.close()
