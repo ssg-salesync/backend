@@ -132,7 +132,7 @@ def test():
         'end': request.args.get('end')
     }
 
-    resp = requests.get("http://service-dash.default.svc.cluster.local/dashboard/sales", headers=headers, params=params)
+    resp = requests.get("http://api.salesync.site/dashboard/sales", headers=headers, params=params)
 
     if resp.status_code != 200:
         return jsonify({
@@ -140,7 +140,11 @@ def test():
             "message": "매출 조회 실패"
         }), 200
 
-    sales_json = json.dumps(resp.json())
+    # consulting = ConsultingResults(req_id="45b2086b-3a77-4c09-8")
+    consulting = ConsultingResults.query.filter_by(req_id="45b2086b-3a77-4c09-8").first()
+    result = {'req_id': consulting.req_id, 'response': consulting.result}
+    # print(result)
+    send_message("test", result)
 
     return jsonify({
         "req_id": "45b2086b-3a77-4c09-8"
@@ -152,16 +156,17 @@ global_integer = 0
 @bp.route('/test/<req_id>', methods=['GET'])
 def test_check_consulting(req_id):
     global global_integer
-    if global_integer == 5:
+    if global_integer == 3:
         global_integer = 0
-        return jsonify({
-            "result": "not completed",
-            "message": "컨설팅 진행 중"
-        }), 200
-    else:
-        global_integer += 1
         return jsonify({
             "result": "success",
             "message": "컨설팅 완료",
             "req_id": req_id
         }), 200
+    else:
+        global_integer += 1
+        return jsonify({
+            "result": "not completed",
+            "message": "컨설팅 진행 중"
+        }), 200
+
