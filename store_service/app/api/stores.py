@@ -47,38 +47,34 @@ def get_stores():
 
 @bp.route('/', methods=['POST'])
 def create_store():
+    data = request.get_json()
+
+    username = data['username']
+    password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    owner_name = data['owner_name']
+    phone = data['phone']
+    store_name = data['store_name']
+    address = data['address']
+    store_type = data['store_type']
+
+    print(username, password, owner_name, phone, store_name, address, store_type)
+
+    new_store = Stores(username=username, password=password, owner_name=owner_name, phone=phone, store_name=store_name,
+                   address=address, store_type=store_type)
+    db.session.add(new_store)
+    db.session.commit()
+
+    resp = first_login(username, data['password'])
+
     return jsonify({
-        "result": "failed",
-        "message": "매장 등록 실패"
-    }), 500
-    # data = request.get_json()
-    #
-    # username = data['username']
-    # password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    # owner_name = data['owner_name']
-    # phone = data['phone']
-    # store_name = data['store_name']
-    # address = data['address']
-    # store_type = data['store_type']
-    #
-    # print(username, password, owner_name, phone, store_name, address, store_type)
-    #
-    # new_store = Stores(username=username, password=password, owner_name=owner_name, phone=phone, store_name=store_name,
-    #                address=address, store_type=store_type)
-    # db.session.add(new_store)
-    # db.session.commit()
-    #
-    # resp = first_login(username, data['password'])
-    #
-    # return jsonify({
-    #     "result": "success",
-    #     "message": "매장 등록 성공",
-    #     "store_id": resp['store_id'],
-    #     "token": {
-    #         "access_token": resp['access_token'],
-    #         "csrf_token": resp['csrf_token']
-    #     }
-    # }), 201
+        "result": "success",
+        "message": "매장 등록 성공",
+        "store_id": resp['store_id'],
+        "token": {
+            "access_token": resp['access_token'],
+            "csrf_token": resp['csrf_token']
+        }
+    }), 201
 
 
 @bp.route('/', methods=['GET'])
