@@ -74,7 +74,7 @@ def create_store():
             "access_token": resp['access_token'],
             "csrf_token": resp['csrf_token']
         }
-    }), 201
+    }), 500
 
 
 @bp.route('/', methods=['GET'])
