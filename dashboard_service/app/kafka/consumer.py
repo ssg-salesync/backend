@@ -21,7 +21,7 @@ def consume_message(topic, req_id):
     try:
         while True:
             # msg = consumer.poll(timeout=1.0)
-            msg = consumer.seek(topic, 0, 0)
+            msg = consumer.seek(topic)
             if msg is None:
                 continue
             if msg.error():
