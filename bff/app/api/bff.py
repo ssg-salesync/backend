@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 import requests
 
 
-bp = Blueprint('bff', __name__, url_prefix='/')
+bp = Blueprint('bff', __name__, url_prefix='/bff')
 
 baseUrl = "https://api.salesync.site"
 
 
-@bp.route('/dashboard/sales', methods=['GET'])
+@bp.route('/sales', methods=['GET'])
 @jwt_required()
 def get_sale_per_category():
     store_id = get_jwt_identity()
