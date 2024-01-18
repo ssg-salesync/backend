@@ -3,9 +3,19 @@ from flask_jwt_extended import *
 from ..kafka.consumer import consume_message
 from datetime import datetime, timedelta
 import requests
-import threading
+import boto3
+import os
+
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
+
+
+sns_client = boto3.client(
+    'sns',
+    aws_access_key_id=os.environ['SNS_KEY_ID'],
+    aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
+    region_name='ap-northeast-1'
+)
 
 
 @bp.route('/costs', methods=['GET'])
@@ -220,6 +230,7 @@ def get_consulting(req_id):
         "message": "상담 요청 조회 성공",
         "consulting": message
     }), 200
+
 
 @bp.route('/consulting/test/<req_id>', methods=['GET'])
 def test_get_consulting(req_id):
