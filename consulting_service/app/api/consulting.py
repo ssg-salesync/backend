@@ -157,7 +157,7 @@ global_integer = 0
 @bp.route('/test/<req_id>', methods=['GET'])
 def test_check_consulting(req_id):
     global global_integer
-    if global_integer == 3:
+    if global_integer == 2:
         global_integer = 0
         return jsonify({
             "result": "success",
