@@ -231,6 +231,7 @@ def get_consulting(req_id):
         "consulting": message
     }), 200
 
+
 @bp.route('/consulting/test/<req_id>', methods=['GET'])
 def test_get_consulting(req_id):
     message = consume_message('test', req_id)
