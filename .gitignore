@@ -5,3 +5,4 @@ venvs/
 .idea/
 .idea/*
 .env*
+.pytest_cache/

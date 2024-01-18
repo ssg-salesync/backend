@@ -1,202 +1,105 @@
 from flask import Blueprint, request, jsonify
-from flask_cors import CORS
+from ..models import db, Categories
 from flask_jwt_extended import *
-from models.models import db
-from models.models import Categories, Items, Stores
+from sqlalchemy import asc
 
-bp = Blueprint('categories', __name__, url_prefix='/ca')
 
-# 카테고리 조회
-@bp.route('/stores/<store_id>/categories', methods=['GET'])
-def get_category(store_id : int) :
-    categories = Categories.query.filter(store_id == store_id).all()
-    store = Stores.query.filter(store_id == store_id).first()
-    
-    print("categories: ", categories)
-    print("stores: ", store)
+bp = Blueprint('categories', __name__, url_prefix='/categories')
 
-    resp = {
+
+@bp.route('/', methods=['GET'])
+@jwt_required()
+def get_category():
+    store_id = get_jwt_identity()
+    categories = Categories.query.filter_by(store_id=store_id, enabled=True).order_by(asc(Categories.category_id)).all()
+
+    return jsonify({
         "categories": [
             {
-                "id": categories.category_id,
-                "name": categories.name
+                "id": category.category_id,
+                "name": category.name
             }
+            for category in categories
         ],
-        "store_id": store.store_id
-    }
+        "store_id": store_id
+    }), 200
 
-    return jsonify(resp)
 
-# 카테고리 등록
-@bp.route('/stores/<store_id>/categories', methods='POST')
+@bp.route('/', methods=['POST'])
 @jwt_required()
-def post_category(store_id : int) :
+def post_category():
+    store_id = get_jwt_identity()
     req = request.get_json()
-    
-    store = Stores.query.filter(store_id=get_jwt_identity()).first()
+    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
-    # jwt 권한 x
-    if store.store_id != store_id:
-        resp = {
+    if existing_category:
+        return {
             "result": "failed",
-            "message": "카테고리 등록 권한 없음"
-        }
-
-        return jsonify(resp), 400
+            "message": '존재하는 카테고리'
+        }, 409
 
     new_category = Categories(
-        name = req['name'],
-        store_id = store.store_id
+        name=req['name'],
+        store_id=store_id
     )
 
     db.session.add(new_category)
     db.session.commit()
 
-
-    resp = {
+    return jsonify({
         "result": "success",
         "message": "카테고리 등록 성공",
-        "category_id": new_category.category_id
-    }
-
-    return jsonify(resp), 200
-
-# 카테고리 삭제
-@bp.route('/stores/<store_id>/categories/<category_id>', methods=['DELETE'])
-@jwt_required
-def delete_category(store_id: int, category_id: int) :
-
-    category = Categories.query.filter(category_id=category_id).first()
-    store = Stores.query.filter(store_id=get_jwt_identity()).first()
-
-    if category.store_id != store.store_id :
-        resp = {
-            "result" : "failed",
-            "message" : "카테고리 삭제 권한 없음"
-        }
-
-        return jsonify(resp), 400
-
-    db.session.delete(category)
-    db.session.commit()
-
-    resp = {
-        "result" : "success",
-        "message" : "카테고리 삭제 성공",
-        "category_id" : category_id
-    }
-
-    return jsonify(resp), 200
-
-# 품목 리스트 조회
-@bp.route('/stores/<store_id>/items', methods=['GET'])
-def get_item(store_id: int) :
-
-    items = Items.query.filter(store_id=store_id).all()
-    
-    resp = {
-        "items": [
-            {
-                "id" : items.item_id,
-                "name" : items.name,
-                "category_id": items.category_id,
-                "price": items.price,
-                "description": items.description
-            }
-        ]
-    }
-
-    return jsonify(resp), 200
+        "id": new_category.category_id
+    }), 201
 
 
-#품목 등록
-@bp.route('/stores/<store_id>/items', methods=['POST'])
-@jwt_required
-def post_item(store_id: int) :
-    req = request.get_json()
+@bp.route('/<int:category_id>', methods=['PUT'])
+@jwt_required()
+def put_category(category_id: int):
+    store_id = get_jwt_identity()
+    category = Categories.query.filter_by(category_id=category_id).first()
 
-    store = Stores.query.filter(store_id=get_jwt_identity()).first()
-
-    # 등록 실패
-    if store.store_id != store_id:
-        resp = {
-            "result" : "failed",
-            "message" : "품목 등록 권한 없음"
-        }
-        return jsonify(resp), 400
-    
-    new_item = Items(name=req['name'], category_id=req['category_id'], price=req['price'], description=req['description'])
-
-    db.session.add(new_item)
-    db.session.commit()
-    
-    resp = {
-        "result" : "success",
-        "message" : "품목 등록 성공",
-        "item_id" : new_item.item_id
-    }
-
-    return jsonify(resp), 200
-
-# 품목 수정
-@bp.route('/stores/<store_id>/items/<item_id>', methods=['PUT']) 
-@jwt_required
-def put_item(store_id : int, item_id : int) : 
-    req = request.get_json()
-
-    store = Stores.query.filter(store_id=get_jwt_identity()).first()
-
-    # 품목 수정 실패
-    if store.store_id != store_id:
-        resp = {
-            "result" : "failed",
-            "message" : "품목 수정 권한 없음"
-        }
-
-        return jsonify(resp), 400
-    
-    item = Items.query.get(item_id).first()
-    item.name = req['name']
-    item.category_id = req['category_id']
-    item.price = req['price']
-    item.description = req['description']
-
-    db.session.commit()
-    
-    resp = {
-        "result" : "success",
-        "message" : "품목 수정 성공", 
-        "item_id" : item.item_id
-    }
-
-    return jsonify(resp), 200
-
-# 품목 삭제
-@bp.route('/stores/<store_id>/items/<item_id>', methods=['DELETE'])
-@jwt_required
-def delete_item(store_id: int, item_id: int) : 
+    if category is None:
+        return {
+            "result": "failed",
+            "message": '존재하지 않는 카테고리.'
+        }, 404
 
     req = request.get_json()
+    existing_category = Categories.query.filter_by(name=req['name'], store_id=store_id, enabled=True).first()
 
-    store = Stores.query.filter(store_id=get_jwt_identity()).first()
+    if existing_category:
+        return {
+            "result": "failed",
+            "message": '존재하는 카테고리'
+        }, 409
 
-    # 품목 삭제 실패
-    if store.store_id != store_id:
-        resp = {
-            "result" : "failed",
-            "message" : "품목 삭제 권한 없음"
-        }
-        return jsonify(resp), 400
-    
-    item = Items.query.filter(item_id=item_id).first()
-
-    db.session.delete(item)
+    category.name = req['name']
     db.session.commit()
 
-    resp = {
-        "result" : "success",
-        "message" : "품목 삭제 성공",
-        "item_id" : item.item_id
-    }
+    return jsonify({
+        "result": "success",
+        "message": "카테고리 수정 성공",
+        "id": category_id
+    }), 201
 
-    return jsonify(resp), 200
+
+@bp.route('/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id: int):
+    category = Categories.query.filter_by(category_id=category_id).first()
+
+    if category is None:
+        return {
+            "result": "failed",
+            "message": '카테고리가 존재하지 않습니다.'
+        }, 404
+
+    category.enabled = False
+    db.session.commit()
+
+    return jsonify({
+        "result": "success",
+        "message": "카테고리 삭제 성공",
+        "category_id": category_id
+    }), 200
+

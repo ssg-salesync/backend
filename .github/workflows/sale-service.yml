@@ -1,9 +1,9 @@
-name: Build and Push Item Service to ECR
+name: Build and Push Sale Service to ECR
 
 on:
   push:
     paths:
-      - 'item_service/**'
+      - 'sale_service/**'
     branches:
       - main
 
@@ -43,8 +43,8 @@ jobs:
 
     - name: Build and Push Docker Image to ECR
       run: |
-        docker build -t ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_ITEM_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }} -f Dockerfile-item --platform linux/amd64 .
-        docker push ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_ITEM_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }}
+        docker build -t ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_SALE_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }} -f Dockerfile-sale --platform linux/amd64 .
+        docker push ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_SALE_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }}
 
     - name: Checkout for Kustomize Repository
       uses: actions/checkout@v3
@@ -58,7 +58,7 @@ jobs:
       run: |
         pwd
         cd cicd/overlays/prd/
-        kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/item-service=${{ steps.login-ecr.outputs.registry }}/item-service:${{ steps.tag_version.outputs.new_tag }} 
+        kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/sale-service=${{ steps.login-ecr.outputs.registry }}/sale-service:${{ steps.tag_version.outputs.new_tag }} 
         cat kustomization.yaml
 
     - name: Commit Manifest Files

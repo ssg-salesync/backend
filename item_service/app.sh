@@ -1,6 +1,6 @@
 #!/bin/sh
 # shellcheck disable=SC2164
-cd /salesync/store_service
+cd /salesync/item_service
 
 flask db init
 flask db migrate

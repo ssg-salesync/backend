@@ -1,0 +1,22 @@
+FROM ubuntu:20.04
+
+WORKDIR /salesync
+
+COPY dashboard_service /salesync/dashboard_service
+
+RUN apt-get update -y
+RUN apt-get install -y libpq-dev
+RUN apt-get install -y python3-dev
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
+
+RUN pip install wheel
+RUN pip install -r /salesync/dashboard_service/requirements.txt
+
+ENV FLASK_APP=app
+ENV FLASK_DEBUG=true
+ENV APP_CONFIG_FILE=/salesync/dashboard_service/config/development.py
+ENV SECRET_KEY=b'\xa2\xa4A\x84\x9f\x86\x82\x05G\xe2\xb2eD\x18p\x01'
+ENV JWT_SECRET_KEY=b'\xb4\xc4\x8b\xfbU\xc1\x8d\x1d\x82\xca\x08^\x0bO\x05I'
+
+CMD cd /salesync/dashboard_service && python3 -m flask run --host=0.0.0.0

@@ -28,7 +28,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_envvar('APP_CONFIG_FILE')
 
-    # CORS(app)
     CORS(app, resources={r"/*": {"origins": "*"}})
 
     db.init_app(app)
@@ -36,10 +35,9 @@ def create_app():
     jwt.init_app(app)
     migration.init_app(app, db)
 
-    from .api import categories, items, main
+    from .api import sales, main
 
-    app.register_blueprint(categories.bp)
-    app.register_blueprint(items.bp)
+    app.register_blueprint(sales.bp)
     app.register_blueprint(main.bp)
 
     return app
