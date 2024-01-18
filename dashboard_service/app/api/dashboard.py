@@ -3,18 +3,9 @@ from flask_jwt_extended import *
 from ..kafka.consumer import consume_message
 from datetime import datetime, timedelta
 import requests
-import boto3
-import os
+import threading
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
-
-
-sns_client = boto3.client(
-    'sns',
-    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
-    region_name='ap-northeast-1'
-)
 
 
 @bp.route('/costs', methods=['GET'])
@@ -118,7 +109,7 @@ def get_total_volumes():
     if start == end:
         sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily',
                                   params={'store_id': store_id, 'date': start}).json()
-        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/daily',
+        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
                                   params={'store_id': store_id, 'start': start, 'end': end}).json()
         item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
                                  headers=headers, params={'store_id': store_id}).json()
@@ -155,7 +146,7 @@ def get_total_volumes():
             start_str = start.strftime('%Y-%m-%d')
             end_str = end.strftime('%Y-%m-%d')
 
-            sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/period',
+            sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily',
                                       params={'store_id': store_id, 'date': date_str}).json()
             order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
                                       params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
@@ -230,7 +221,6 @@ def get_consulting(req_id):
         "consulting": message
     }), 200
 
-
 @bp.route('/consulting/test/<req_id>', methods=['GET'])
 def test_get_consulting(req_id):
     message = consume_message('test', req_id)
@@ -239,41 +229,4 @@ def test_get_consulting(req_id):
         "result": "success",
         "message": "상담 요청 조회 성공",
         "consulting": message
-    }), 200
-
-
-@bp.route('/settlements', methods=['GET'])
-@jwt_required()
-def send_message():
-    date = request.args.get('date')
-
-    headers = {
-        'Authorization': request.headers['Authorization'],
-        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN']
-    }
-
-    params = {
-        'start': date,
-        'end': date
-    }
-
-    store = requests.get(f"http://service-store.default.svc.cluster.local/stores/", headers=headers).json()
-    store_name = store['store']['store_name']
-    owner_name = store['store']['owner_name']
-    phone = store['store']['phone']
-
-    sale = requests.get(f"http://service-sale.default.svc.cluster.local/dashboard/sales", headers=headers, params=params).json()
-    sales_volume = sale['sales_volume']
-
-    # message = f"안녕하세요. {owner_name}님, \n\n{date}의 {store_name} 총 매출은 {format(sales_volume, ',')}원입니다. \n\n감사합니다. "
-    message = f"스마트한 AI 클라우드 POS에서 오늘의 총 매출을 알려드립니다. \n총 매출 : {format(sales_volume, ',')}원"
-
-    sns_client.publish(
-        PhoneNumber=f'+82{phone}',
-        Message=message
-    )
-
-    return jsonify({
-        "result": "success",
-        "message": "정산 완료: 메시지 전송 완료"
     }), 200
