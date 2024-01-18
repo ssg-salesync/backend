@@ -241,3 +241,4 @@ def test_get_consulting(req_id):
         "message": "상담 요청 조회 성공",
         "consulting": message
     }), 200
+
