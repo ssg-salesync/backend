@@ -13,8 +13,8 @@ bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 sns_client = boto3.client(
     'sns',
-    aws_access_key_id=os.environ['SNS_KEY_ID'],
-    aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
+    # aws_access_key_id=os.environ['SNS_KEY_ID'],
+    # aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
     region_name='ap-northeast-1'
 )
 
@@ -156,19 +156,11 @@ def get_total_volumes():
 
         idx = int((end - start).days) + 1
 
-        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
+        order_resp = requests.get(f'http://api.salesync.site/orders/period',
                                   params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
-        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
+        item_resp = requests.get(f'http://api.salesync.site/categories/items',
                                  headers=headers, params={'store_id': store_id}).json()
-        # carts_by_date = {}
-        #
-        # for order in order_resp['orders']:
-        #     date_str = datetime.strptime(order['order_date'], "%a, %d %b %Y %H:%M:%S %Z").strftime("%Y-%m-%d")
-        #     if date_str not in carts_by_date:
-        #         carts_by_date[date_str] = []
-        #     carts_by_date[date_str].extend(order['carts'])
-        #
-        # carts_by_date = [{date: carts} for date, carts in carts_by_date.items()]
+
 
         items = {}
 
