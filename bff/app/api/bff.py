@@ -231,3 +231,46 @@ def get_bff_cost():
         }), 200
     except Exception as e:
         return jsonify({"error": "내부 서버 오류"}),500
+
+@bp.route('/costs', methods=['POST'])
+def post_cost():
+    try:
+        req = request.get_json()
+        return_list = []
+
+        headers = {
+            'Authorization': request.headers['Authorization'],
+            'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN']
+        }
+
+        print("req['items']" ,req['items'])
+        print("=====================")
+        newData = []
+
+        for category in req['items']:
+            category_id = category["category_id"]
+            category_name = category["category_name"]
+
+            for item in category["items"]:
+                transformed_item = {
+                    "item_id": item["item_id"],
+                    # "name": item["name"],
+                    # "category_id": category_id,
+                    # "category_name": category_name,
+                    # "price": item["price"],
+                    "cost": item["cost"]
+                }
+                newData.append(transformed_item)
+        print("newData", newData)
+        returnData = {'items':newData}
+        print("===========")
+        print("returnData", returnData)
+        
+        res = requests.post(f'{baseUrl}/dashboard/costs', headers=headers,
+                                        json = returnData ).json()
+        print("=================")
+        print("res",res)
+
+        return jsonify(res), 200
+    except Exception as e :
+        return jsonify({"error": str(e)})
