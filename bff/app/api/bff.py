@@ -11,7 +11,7 @@ baseUrl = "https://api.salesync.site"
 
 @bp.route('/sales', methods=['GET'])
 @jwt_required()
-def get_sale_per_category():
+def get_bff_sale_per_category():
     store_id = get_jwt_identity()
     start = request.args.get('start')
     end = request.args.get('end')
@@ -66,7 +66,7 @@ def get_sale_per_category():
     
 @bp.route('/volumes', methods=['GET'])
 @jwt_required()
-def get_total_volumes():
+def get_bff_total_volumes():
     store_id = get_jwt_identity()
     start = request.args.get('start')
     end = request.args.get('end')
@@ -180,5 +180,54 @@ def get_items_in_orders(order_resp, item_resp):
 
     return items
 
+# 원가 조회
+@bp.route('/costs', methods=['GET'])
+@jwt_required()
+def get_bff_cost():
+    try:
+        store_id = get_jwt_identity()
 
+        res = requests.get(f'{baseUrl}/categories/items/costs',
+                                    params={'store_id': store_id}).json()
 
+        # 변환된 데이터를 담을 빈 리스트
+        transformed_data = []
+
+        # 각 항목을 순회하며 새로운 형식으로 변환
+        for item in res['items']:
+            category_id = item['category_id']
+            category_name = item['category_name']
+            item_info = {
+                'name': item['name'],
+                'price': item['price'],
+                'cost': item['cost'],
+                'item_id': item['item_id']
+            }
+
+            # 해당 카테고리가 이미 결과에 있는지 확인
+            category_found = False
+            for category in transformed_data:
+                if category['category_id'] == category_id:
+                    category['items'].append(item_info)
+                    category_found = True
+                    break
+
+            # 해당 카테고리가 결과에 없으면 새로운 카테고리 추가
+            if not category_found:
+                new_category = {
+                    'category_id': category_id,
+                    'category_name': category_name,
+                    'items': [item_info]
+                }
+                transformed_data.append(new_category)
+
+            # 최종 결과 출력
+            print(transformed_data)
+
+        return jsonify({
+                "result": "success",
+                "message": "원가 조회 성공",
+                "items": transformed_data
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "내부 서버 오류"}),500
