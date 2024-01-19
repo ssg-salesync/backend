@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, logging
 from flask_jwt_extended import *
 from ..kafka.consumer import consume_message
 from datetime import datetime, timedelta
+from collections import defaultdict
 import requests
 import boto3
 import os
@@ -147,32 +148,60 @@ def get_total_volumes():
         }), 200
     else:
         total = []
+
         start = datetime.strptime(start, '%Y-%m-%d')
         end = datetime.strptime(end, '%Y-%m-%d')
+        start_str = start.strftime('%Y-%m-%d')
+        end_str = end.strftime('%Y-%m-%d')
 
-        for i in range(int((end - start).days) + 1):
-            date = start + timedelta(days=i)
-            date_str = date.strftime('%Y-%m-%d')
-            start_str = start.strftime('%Y-%m-%d')
-            end_str = end.strftime('%Y-%m-%d')
+        idx = int((end - start).days) + 1
 
-            sales_resp = requests.get(f'http://service-sale.default.svc.cluster.local/sales/daily',
-                                      params={'store_id': store_id, 'date': date_str}).json()
-            order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
-                                      params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
-            item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
-                                     headers=headers, params={'store_id': store_id}).json()
+        order_resp = requests.get(f'http://service-order.default.svc.cluster.local/orders/period',
+                                  params={'store_id': store_id, 'start': start_str, 'end': end_str}).json()
+        item_resp = requests.get(f'http://service-item.default.svc.cluster.local/categories/items',
+                                 headers=headers, params={'store_id': store_id}).json()
+        # carts_by_date = {}
+        #
+        # for order in order_resp['orders']:
+        #     date_str = datetime.strptime(order['order_date'], "%a, %d %b %Y %H:%M:%S %Z").strftime("%Y-%m-%d")
+        #     if date_str not in carts_by_date:
+        #         carts_by_date[date_str] = []
+        #     carts_by_date[date_str].extend(order['carts'])
+        #
+        # carts_by_date = [{date: carts} for date, carts in carts_by_date.items()]
 
-            items = get_items_in_orders(order_resp, item_resp)
+        items = {}
+
+        for category in item_resp["categories"]:
+            for item in category["items"]:
+                item_id = item["item_id"]
+                items[item_id] = {
+                    "cost": item["cost"],
+                    "price": item["price"]
+                }
+
+        grouped_items = defaultdict(lambda: defaultdict(int))
+
+        for order in order_resp['orders']:
+            date = datetime.strptime(order['order_date'], "%a, %d %b %Y %H:%M:%S GMT").strftime('%Y-%m-%d')
+            for cart in order['carts']:
+                item_id = cart['item_id']
+                quantity = cart['quantity']
+                grouped_items[date][item_id] += quantity
+
+        grouped_items = {date: dict(items) for date, items in grouped_items.items()}
+
+        for i in range(idx):
+            date = (start + timedelta(days=i)).strftime('%Y-%m-%d')
             profit = 0
+            sales_volume = 0
 
-            for item in items:
-                profit += item['profit']
-
-            sales_volume = sales_resp['sales_volume']
+            for item_id, quantity in grouped_items[date].items():
+                profit += (items[item_id]['price'] - items[item_id]['cost']) * quantity
+                sales_volume += items[item_id]['price'] * quantity
 
             total.append({
-                "date": date.strftime('%Y-%m-%d'),
+                "date": date,
                 "profit": profit,
                 "sales_volume": sales_volume
             })
@@ -221,6 +250,18 @@ def get_items_in_orders(order_resp, item_resp):
     return items
 
 
+def get_sales_by_cart(cart, items):
+    sales = 0
+    profit = 0
+
+    for record in cart:
+        item_id = record['item_id']
+        profit += (items[item_id]['price'] - items[item_id]['cost']) * record['quantity']
+        sales += items[item_id]['price'] * record['quantity']
+
+    return sales, profit
+
+
 @bp.route('/consulting/<req_id>', methods=['GET'])
 def get_consulting(req_id):
     message = consume_message('consulting', req_id)
@@ -241,3 +282,5 @@ def test_get_consulting(req_id):
         "message": "상담 요청 조회 성공",
         "consulting": message
     }), 200
+
+
