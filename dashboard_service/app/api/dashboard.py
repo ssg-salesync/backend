@@ -275,4 +275,3 @@ def test_get_consulting(req_id):
         "consulting": message
     }), 200
 
-

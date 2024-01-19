@@ -43,7 +43,7 @@ jobs:
 
     - name: Build and Push Docker Image to ECR
       run: |
-        docker build -t ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_DASH_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }} -f Dockerfile-dash --build-arg SNS_KEY_ID=${{ secrets.SNS_KEY_ID }} --platform linux/amd64 .
+        docker build -t ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_DASH_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }} -f Dockerfile-dash --build-arg SNS_SECRET_KEY=${{ secrets.SNS_SECRET_KEY }} --platform linux/amd64 .
         docker push ${{ secrets.AWS_REGISTRY_URL }}/${{ secrets.AWS_DASH_REPOSITORY_URL }}:${{ steps.tag_version.outputs.new_tag }}
 
     - name: Checkout for Kustomize Repository
