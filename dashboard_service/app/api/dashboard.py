@@ -296,7 +296,7 @@ def send_message():
     owner_name = store['store']['owner_name']
     phone = store['store']['phone']
 
-    sale = requests.get(f"http://service-sale.default.svc.cluster.local/dashboard/sales", headers=headers, params=params).json()
+    sale = requests.get(f"http://api.salesync.site/dashboard/sales", headers=headers, params=params).json()
     sales_volume = sale['sales_volume']
 
     # message = f"안녕하세요. {owner_name}님, \n\n{date}의 {store_name} 총 매출은 {format(sales_volume, ',')}원입니다. \n\n감사합니다. "
