@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import *
@@ -216,12 +216,10 @@ def get_sales_per_period():
 
     start = datetime.strptime(start_str, '%Y-%m-%d')
     end = datetime.strptime(end_str, '%Y-%m-%d')
+    end = end + timedelta(days=1)
 
-    orders = Orders.query.filter_by(store_id=store_id).filter(
-        db.func.date(Orders.order_date) >= db.func.date(start)
-    ).filter(
-        db.func.date(Orders.order_date) <= db.func.date(end)
-    ).all()
+    orders = Orders.query.filter_by(store_id=store_id).filter(Orders.order_date.between(start, end)).all()
+    print(orders)
 
     cart_in_order = get_carts_in_order(orders)
 
@@ -286,7 +284,9 @@ def get_items_in_cart(carts):
 
     for item_id, quantity in item_quantity_mapping.items():
         try:
-            response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            # response = requests.get(f'http://service-item.default.svc.cluster.local/categories/items/{item_id}')
+            response = requests.get(f'https://api.salesync.site/categories/items/{item_id}')
+
             response.raise_for_status()
             item = response.json()['item']
 
