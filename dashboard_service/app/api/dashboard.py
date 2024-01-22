@@ -13,8 +13,8 @@ bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 sns_client = boto3.client(
     'sns',
-    # aws_access_key_id=os.environ['SNS_KEY_ID'],
-    # aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
+    aws_access_key_id=os.environ['SNS_KEY_ID'],
+    aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
     region_name='ap-northeast-1'
 )
 
@@ -276,7 +276,7 @@ def test_get_consulting(req_id):
     }), 200
 
 
-@bp.route('/settlements', methods=['GET'])
+@bp.route('/calculate', methods=['GET'])
 @jwt_required()
 def send_message():
     date = request.args.get('date')
