@@ -274,8 +274,6 @@ def test_get_consulting(req_id):
         "message": "상담 요청 조회 성공",
         "consulting": message
     }), 200
-<<<<<<< HEAD
-=======
 
 
 @bp.route('/calculate', methods=['GET'])
@@ -314,4 +312,3 @@ def send_message():
         "message": "정산 완료: 메시지 전송 완료"
     }), 200
 
->>>>>>> refs/remotes/origin/main
