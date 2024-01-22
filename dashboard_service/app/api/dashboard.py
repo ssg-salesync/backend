@@ -13,8 +13,8 @@ bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 sns_client = boto3.client(
     'sns',
-    # aws_access_key_id=os.environ['SNS_KEY_ID'],
-    # aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
+    aws_access_key_id=os.environ['SNS_KEY_ID'],
+    aws_secret_access_key=os.environ['SNS_SECRET_KEY'],
     region_name='ap-northeast-1'
 )
 
@@ -274,3 +274,44 @@ def test_get_consulting(req_id):
         "message": "상담 요청 조회 성공",
         "consulting": message
     }), 200
+<<<<<<< HEAD
+=======
+
+
+@bp.route('/calculate', methods=['GET'])
+@jwt_required()
+def send_message():
+    date = request.args.get('date')
+
+    headers = {
+        'Authorization': request.headers['Authorization'],
+        'X-CSRF-TOKEN': request.headers['X-CSRF-TOKEN']
+    }
+
+    params = {
+        'start': date,
+        'end': date
+    }
+
+    store = requests.get(f"http://service-store.default.svc.cluster.local/stores/", headers=headers).json()
+    store_name = store['store']['store_name']
+    owner_name = store['store']['owner_name']
+    phone = store['store']['phone']
+
+    sale = requests.get(f"http://api.salesync.site/dashboard/sales", headers=headers, params=params).json()
+    sales_volume = sale['sales_volume']
+
+    # message = f"안녕하세요. {owner_name}님, \n\n{date}의 {store_name} 총 매출은 {format(sales_volume, ',')}원입니다. \n\n감사합니다. "
+    message = f"스마트한 AI 클라우드 POS에서 오늘의 총 매출을 알려드립니다. \n총 매출 : {format(sales_volume, ',')}원"
+
+    sns_client.publish(
+        PhoneNumber=f'+82{phone}',
+        Message=message
+    )
+
+    return jsonify({
+        "result": "success",
+        "message": "정산 완료: 메시지 전송 완료"
+    }), 200
+
+>>>>>>> refs/remotes/origin/main
