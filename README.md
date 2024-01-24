@@ -193,6 +193,32 @@
     - app.sh: 빌드 시 실행 파일
 - Dockerfile-*: 해당 서비스 dockerfile
 
+## 기술 스택
+![Static Badge](https://img.shields.io/badge/flask-%23000000?style=flat&logo=flask&logoColor=white)
+![Static Badge](https://img.shields.io/badge/SQLAlchemy-%23D71F00?style=flat&logo=sqlalchemy&logoColor=white)
+![Static Badge](https://img.shields.io/badge/PostgreSQL-%234169E1?style=flat&logo=postgresql&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Apache%20Kafka-%23231F20?style=flat&logo=apachekafka&logoColor=white)
+
+![Static Badge](https://img.shields.io/badge/Docker-%232496ED?style=flat&logo=docker&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Amazon%20RDS-%23527FFF?style=flat&logo=amazonrds&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Amazon%20EKS-%23FF9900?style=flat&logo=amazoneks&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Amazon%20DynamoDB-%234053D6?style=flat&logo=amazondynamodb&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Amazon%20S3-%23569A31?style=flat&logo=amazons3&logoColor=white)
+
+![Static Badge](https://img.shields.io/badge/Terraform-%23844FBA?style=flat&logo=terraform&logoColor=white)
+
+![Static Badge](https://img.shields.io/badge/GitHub%20Actions-%232088FF?style=flat&logo=githubactions&logoColor=white)
+![Static Badge](https://img.shields.io/badge/ArgoCD-%23EF7B4D?style=flat&logo=argo&logoColor=white)
+
+![Static Badge](https://img.shields.io/badge/Elasticsearch-%23005571?style=flat&logo=elasticsearch&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Fluentd-%230E83C8?style=flat&logo=fluentd&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Kibana-%23005571?style=flat&logo=kibana&logoColor=white)
+
+![Static Badge](https://img.shields.io/badge/Prometheus-%23E6522C?style=flat&logo=prometheus&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Grafana-%23F46800?style=flat&logo=grafana&logoColor=white)
+
+
+
 ## Services
 ### Store Servcie
 
@@ -253,6 +279,7 @@
 - 컨설팅 조회
 - Sale, Order, Item 서비스와 내부 통신
 - Consulting 서비스의 Kafka Producer가 송신한 이벤트 수신하는 Kafka Consumer
+- 하루 매출 정산 문자 전송
 
 <details>
 <summary> Dashboard 서비스 API 명세서</summary>
@@ -294,6 +321,12 @@ http://service-item.default.svc.cluster.local
 각각의 producer와 consumer은 consulting 토픽으로 이벤트를 송수신한다.
 
 consumer에서는 메시지를 받을 때, 파라미터로 받은 req_id에 해당하는 메시지를 서칭하여 반환해준다.
+
+### Amazon SNS 이용한 문자 전송
+정산하기 버튼 클릭시 해당하는 매장의 하루 매출 정보를 문자로 전송한다.
+- 서울 리전에서는 Amazon SNS 메시지 서비스가 안되어 도쿄 리전에서 사용
+- 센드 박스 해제 시 모든 번호로 문자 전송 가능<br>
+    -> 현재 서비스에서 더미 데이터가 많아 샌드 박스 해제 대신 특정 번호로만 전송되도록 하였다.
 
 ### Trouble Shooting
 1. /dashboards/volumes GET 성능 50%이상 향상
