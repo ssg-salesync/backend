@@ -217,7 +217,10 @@
 ![Static Badge](https://img.shields.io/badge/Prometheus-%23E6522C?style=flat&logo=prometheus&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/Grafana-%23F46800?style=flat&logo=grafana&logoColor=white)
 
-
+### 모노레포
+MSA 아키텍처 서비스를 하나의 레포에서 관리한다.
+각 서비스별 폴더에서 작업 후 변경 사항이 감지되는 경우 자동 build후 ECR에 태그 변경한다. 변경된 태그를 ArgoCD가 감지한 후 각 service와 deploy로 배포한다.
+<img src="sources/argocd.png">
 
 ## Services
 ### Store Servcie
