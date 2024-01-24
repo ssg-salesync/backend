@@ -341,3 +341,8 @@ consumer에서는 메시지를 받을 때, 파라미터로 받은 req_id에 해�
 4. openai sercret key 이슈
 -> 초기 secret key 값이 환경변수로 지정되지 않아 계속 consulting pod CrashLoopBackError 발생
 => key 관리를 위해 secret key로 key를 등록한 후 build 시 arg로 시크릿값을 받아온 후 환경변수로 설정
+5. EFK 스택 이용한 로그 수집 중 부하 발생
+-> 로그 수집 시 fluentd conf 파일 문제로 모든 공백을 수집해와 노드 부하 발생
+<img src="sources/efk부하1.png">
+<img src="sources/efk 부하2.png">
+=> deploy_*default_*.log의 형식을 가진 로그만 수집해오도록 수정 후 해결
