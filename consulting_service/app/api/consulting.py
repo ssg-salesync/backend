@@ -121,7 +121,7 @@ def save_response_to_db(req_id, response_text):
 def test():
 
     result = ConsultingResults.query.filter_by(req_id='a7d9a66e-2c18-40b3-a').first()
-    message = {'req_id': 'a7d9a66e-2c18-40b3-a', 'response': result}
+    message = {'req_id': 'a7d9a66e-2c18-40b3-a', 'response': result['result']}
     send_message("demo", message)
 
 
