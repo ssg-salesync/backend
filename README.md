@@ -217,7 +217,7 @@
 ![Static Badge](https://img.shields.io/badge/Prometheus-%23E6522C?style=flat&logo=prometheus&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/Grafana-%23F46800?style=flat&logo=grafana&logoColor=white)
 
-### 모노레포
+## 모노레포
 MSA 아키텍처 서비스를 하나의 레포에서 관리한다.
 각 서비스별 폴더에서 작업 후 변경 사항이 감지되는 경우 자동 build후 ECR에 태그 변경한다. 변경된 태그를 ArgoCD가 감지한 후 각 service와 deploy로 배포한다.
 <img src="sources/argocd.png">
@@ -304,11 +304,11 @@ MSA 아키텍처 서비스를 하나의 레포에서 관리한다.
 </div>
 </details>
 
-### Database ERD
+## Database ERD
 <img src="sources/salesyncdb.png">
 각 서비스의 데이터베이스는 논리적으로 분리되어 있어, 다른 서비스의 데이터가 필요한 경우 내부 통신을 통해 이용한다.
 
-### Kubernetes 내부 API 통신
+## Kubernetes 내부 API 통신
 <img src="sources/kubernetes_pods.png">
 kubernetes 내부에서 다른 서비스의 pod에 접근하기 위해서는 "<service>.<namespace>.svc.cluster.local"주소로 접근해야한다.
 
@@ -317,7 +317,7 @@ kubernetes 내부에서 다른 서비스의 pod에 접근하기 위해서는 "<s
 http://service-item.default.svc.cluster.local
 ```
 
-### Kafka 비동기 이벤트 처리
+## Kafka 비동기 이벤트 처리
 <img src="sources/Kafka.png">
 사용자가 consulting 서비스로 요청을 보내면 즉시 req_id를 반환한 후 비동기로 gpt api를 호출한다. gpt api가 반환한 값을 받아 producer가 이벤트를 생성하면 dashboard 서비스의 consumer가 수신할 수 있는 구조이다.
 <img src="sources/Kafka2.png">
@@ -325,16 +325,19 @@ http://service-item.default.svc.cluster.local
 
 consumer에서는 메시지를 받을 때, 파라미터로 받은 req_id에 해당하는 메시지를 서칭하여 반환해준다.
 
-### Amazon SNS 이용한 문자 전송
+## Amazon SNS 이용한 문자 전송
 정산하기 버튼 클릭시 해당하는 매장의 하루 매출 정보를 문자로 전송한다.
 - 서울 리전에서는 Amazon SNS 메시지 서비스가 안되어 도쿄 리전에서 사용
 - 센드 박스 해제 시 모든 번호로 문자 전송 가능<br>
     -> 현재 서비스에서 더미 데이터가 많아 샌드 박스 해제 대신 특정 번호로만 전송되도록 하였다.
 
-### Trouble Shooting
+## Trouble Shooting
 1. /dashboards/volumes GET 성능 50%이상 향상
 2. /orders/ POST, PUT request body의 cart에 빈배열인 경우 주문 등록 혹은 수정 실패
 => 빈배열인 경우 기존 주문을 삭제하도록 수정
 3. Database 분리 시 서비스간 존재하지 않는 값 입력<br>
 예) store 서비스에서 10번 스토에 해당하는 정보가 없는데, Item 서비스에 데이터가 입력되는 경우
 => 참조 관계를 명확히하여 조회 후 등록될 수 있도록 수정 
+4. openai sercret key 이슈
+-> 초기 secret key 값이 환경변수로 지정되지 않아 계속 consulting pod CrashLoopBackError 발생
+=> key 관리를 위해 secret key로 key를 등록한 후 build 시 arg로 시크릿값을 받아온 후 환경변수로 설정
