@@ -283,7 +283,7 @@ http://service-item.default.svc.cluster.local
 ## Kafka 비동기 이벤트 처리
 <img src="sources/Kafka.png">
 사용자가 consulting 서비스로 요청을 보내면 즉시 req_id를 반환한 후 비동기로 gpt api를 호출한다. gpt api가 반환한 값을 받아 producer가 이벤트를 생성하면 dashboard 서비스의 consumer가 수신할 수 있는 구조이다.
-<img src="sources/Kafka2.png">
+<img src="sources/kafka2.png">
 각각의 producer와 consumer은 consulting 토픽으로 이벤트를 송수신한다.
 
 consumer에서는 메시지를 받을 때, 파라미터로 받은 req_id에 해당하는 메시지를 서칭하여 반환해준다.
