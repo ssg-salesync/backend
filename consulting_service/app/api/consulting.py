@@ -125,7 +125,7 @@ def test():
     send_message("demo", message)
 
     return jsonify({
-        "req_id": "63fbeb94-1be4-4ba9-9"
+        "req_id": "99fbeb94-1be4-4ba9-1"
     }), 200
 
 
