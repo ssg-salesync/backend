@@ -267,7 +267,7 @@ def get_consulting(req_id):
 
 @bp.route('/consulting/test/<req_id>', methods=['GET'])
 def test_get_consulting(req_id):
-    message = consume_message('demo', req_id)
+    message = consume_message('demof', req_id)
 
     return jsonify({
         "result": "success",
