@@ -147,4 +147,3 @@ def test_check_consulting(req_id):
             "result": "not completed",
             "message": "컨설팅 진행 중"
         }), 200
-
