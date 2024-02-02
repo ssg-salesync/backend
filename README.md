@@ -273,7 +273,7 @@ MSA 아키텍처 서비스를 하나의 레포에서 관리한다.
 
 ## Kubernetes 내부 API 통신
 <img src="sources/kubernetes_pods.png">
-kubernetes 내부에서 다른 서비스의 pod에 접근하기 위해서는 "<service>.<namespace>.svc.cluster.local"주소로 접근해야한다.
+kubernetes 내부에서 다른 서비스의 pod에 접근하기 위해서는 "<해당 pod의 service 네임>.<namespace>.svc.cluster.local"주소로 접근해야한다.
 
 예시
 ```
